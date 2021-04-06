@@ -6,12 +6,12 @@
 
 Update, create secure sudo user, and disable root access.
 
-  - [SSH to root account](#ssh-to-root-account)
-  - [Update Ubuntu packagers](#update-ubuntu-packages)
-  - [Create secure password](#create-secure-password)
-  - [Create sudo user](#create-sudo-user)
-  - [Limit `su` command](#limit-su-command)
-  - [Disable root user](#disable-root-user)
+  - 0.1 [SSH to root account](#ssh-to-root-account)
+  - 0.2 [Update Ubuntu packagers](#update-ubuntu-packages)
+  - 0.3 [Create secure password](#create-secure-password)
+  - 0.4 [Create sudo user](#create-sudo-user)
+  - 0.5 [Limit `su` command](#limit-su-command)
+  - 0.6 [Disable root user](#disable-root-user)
 
 ### Chapter 1: [SSH](#ssh)
 
@@ -19,49 +19,97 @@ Create SSH key login for local machine.
 
 **Note**: `id_some`, `id_some.pub`, and `config` all belong on local machine. Server only needs `authorized_keys`.
 
-  - [Generate SSH key](#generate-ssh-key)
-  - [Set safer permissions](#set-safer-permissions)
-  - [Create alias](#create-alias)
-  - [Authorize local machine](#authorize-local-machine)
-  - [Login with SSH key](#login-with-ssh-key)
+  - 1.1 [Generate SSH key](#generate-ssh-key)
+  - 1.2 [Set safer permissions](#set-safer-permissions)
+  - 1.3 [Create alias](#create-alias)
+  - 1.4 [Authorize local machine](#authorize-local-machine)
+  - 1.5 [Login with SSH key](#login-with-ssh-key)
 
 ### Chapter 2: [Harden SSH](#harden-ssh)
 
 Tweak `sshd`'s configuration to provide much better security.
 
-  - [Create SSH group](#create-ssh-group)
-  - [Edit `/etc/ssh/sshd_config`](#edit-etcsshsshd_config)
-  - [Check for errors in `sshd_config`](check-for-errors-in-sshd_config)
-  - [Only use long Diffie-Hellman moduli](only-use-long-diffie-hellman-moduli)
+  - 2.1 [Create SSH group](#create-ssh-group)
+  - 2.2 [Edit `/etc/ssh/sshd_config`](#edit-etcsshsshd_config)
+  - 2.3 [Check for errors in `sshd_config`](check-for-errors-in-sshd_config)
+  - 2.4 [Only use long Diffie-Hellman moduli](only-use-long-diffie-hellman-moduli)
+  - 2.5 # TODO PAM
 
 ### Chapter 3: [Firewall](#firewall)
 
 Use `ufw` to switch to a block-by-default policy, selecting exactly what is allowed in and out.
 
-  - [Block everything by default in `ufw`](#block-everything-by-default-in-ufw)
-  - [Allow services out](#allow-services-out)
-  - [Allow services in](#allow-services-in)
-  - [Enable UFW](#enable-ufw)
+  - 3.1 [Block everything by default in `ufw`](#block-everything-by-default-in-ufw)
+  - 3.2 [Allow services out](#allow-services-out)
+  - 3.3 [Allow services in](#allow-services-in)
+  - 3.4 [Enable UFW](#enable-ufw)
 
 ### Chapter 4: [NTP](#ntp)
 
-**Network Time Protocol** uses global servers to update system time. Servers rely on accurate system time.
+Sync server to Internet time with **Network Time Protocol**. Servers rely on accurate system time.
 
-Please note NTP requires a port to be open, which is specified in **Chapter 3: Firewall**.
+*Note: NTP requires a port to be open, which is specified in Chapter 3: Firewall.*
 
-  - [Edit `/etc/ntp.conf`](#edit-etcntpconf)
-  - [Restart service](#restart-service)
+  - 4.1 [Edit `/etc/ntp.conf`](#edit-etcntpconf)
+  - 4.2 [Restart service](#restart-service)
 
-### Chapter 5: [Email logging](#email-logging)
+### Chapter 5: [Email](#email)
 
-Before adding Logwatch and other logging services, make sure server can send email.
+Setup outgoing mail server to Gmail account. Chapters after this one offer or require the ability to send mail.
 
-Please note exim4 requires a port to be open, which is specified in **Chapter 3: Firewall**.
+*Note: exim4 requires a port to be open, which is specified in Chapter 3: Firewall.*
 
-  - [Install exim4](#install-exim4)
-  - [Send test email](#send-test-email)
+  - 5.1 [Install mail server (`exim4`)](#install-mail-server-exim4) # TODO
+  - 5.2 [Send test email](#send-test-email) # TODO
 
-#### 
+### Chapter 6: [File Systems](#file-systems)
+
+Limit access to `/proc`, which can contain sensitive info, restrict `/home` directories, set default umasks.
+
+  - 6.1 [Hide pids in `/proc`](#hide-pids-in-proc) # TODO
+  - 6.2 [Limit `/home` permissions](#home-permissions) # TODO
+  - 6.3 [Set default umasks](#default-umasks) # TODO
+
+### Chapter 7: [Reports](#logging)
+
+Run scans for viruses, intrusions and more, and email results in human-readable format ondemand and daily.
+
+  - 7.1 [Daily reports about everything (`logwatch`)](#daily-reports-about-everything-logwatch)
+  - 7.2 [Process accounting (`acct`)](#process-accounting)
+  - 7.3 [Automatic updates (`unattended-upgrades`)](#automatic-updates-unattended-upgrades)
+  - 7.4 [Antivirus (`clamav`)](#antivirus-clamav)
+  - 7.5 [Rootkit detection (`rkhunter`, `chkrootkit`)](#rootkit-detection-rkhunter-chkrootkit)
+  - 7.6 [Host intrusion detection (`ossec`)](#host-intrusion-detection-ossec)
+  - 7.4 [App intrusion detection (`fail2ban`)](#app-intrusion-detection-fail2ban)
+  - 7.5 [File system integrity monitoring (`aide`)](#file-system-integrity-monitoring-aide)
+  - 7.6 [ARP monitoring (`arpwatch`)](#arp-monitoring-arpwatch)
+
+### Chapter 8: [Harden kernel](#harden-kernel)
+
+### Chapter 9: [Harden services](#harden-services)
+
+### Chapter 10: [Sandbox processes](#sandbox-processes)
+
+### Chapter 11: [Audit](#audit)
+
+### Chapter 98: [Keep local system safe](#keep-local-system-safe)
+
+It's fun to set up a `firejail` for every process and receive daily reports about file system integrity, but none of that matters if the local machine used to connect is breached. The SSH key and sudoer password are essential to the security of the system. Systems used to connect should ideally be just as safe as the server itself.
+
+### Chapter 99: [Optional extras](#optional-extras)
+
+There are a lot more things you can do to tighten up a server, but they are a little more opinionated.
+
+- You *can* use disk encryption, but that only helps if someone breaks in and steals your PC;
+- You *may be able to* create separate partitions for `/home`, `/var`, etc., but VPS images may install automatically, preventing this;
+- You *could* set a password reset age, but with a sufficiently long password will this really help?
+- And many more.
+
+Here are some useful extra avenues with their benefits and drawbacks.
+
+  - 99.1 [Disk encryption](#disk-encryption)
+  - 99.2 [Separate partitions](#separate-partitions)
+  - 99.3 [Verify `ntpq` peers](#verify-ntpq-peers)
 
 ## Beginning
 
@@ -292,7 +340,7 @@ Optionally, consider also meeting [Mozilla recommendations for SSH *client* on l
 
 ## Firewall
 
-Switch to a block-by-default policy, selecting exactly what is allowed in and out.
+Use ufw to switch to a block-by-default policy, selecting exactly what is allowed in and out.
 
 ### Block everything by default in `ufw`
 
@@ -339,6 +387,8 @@ sudo ufw status
 
 **Network Time Protocol** uses global servers to update system time. Servers rely on accurate system time.
 
+*Note: NTP requires a port to be open, which is specified in Chapter 3: Firewall.*
+
 ### Edit `/etc/ntp.conf`
 
 Optionally, make the changes by commenting out lines beginning with `server` or `pool`, and add `pool pool.ntp.org iburst` to the end on a new line.
@@ -358,10 +408,52 @@ sudo service ntp status # Checks on status of service with latest stdout, will r
 sudo ntpq -p # Prints NTP peer status
 ```
 
-## Email logging
+## Email
 
-Before adding Logwatch and other logging services, make sure server can send email.
+Setup outgoing mail server to Gmail account. Chapters after this one offer or require the ability to send mail.
 
-Please note exim4 requires a port to be open, which is specified in **Chapter 3: Firewall**.
+*Note: exim4 requires a port to be open, which is specified in Chapter 3: Firewall.*
 
+### Install mail server (`exim4`)
 
+### Send test email
+
+## File Systems
+
+Limit access to `/proc`, which can contain sensitive info, restrict `/home` directories, set default umasks.
+
+### Hide pids in `proc`
+
+### Limit `/home` permissions
+
+### Set default umasks
+
+## Chapter 7: Reports
+
+Run scans for viruses, intrusions and more, and email results in human-readable format ondemand and daily.
+
+### 7.1 Daily reports about everything (`logwatch`)
+### 7.2 Process accounting (`acct`)
+### 7.3 Automatic updates (`unattended-upgrades`)
+### 7.4 Antivirus (`clamav`)
+### 7.5 Rootkit detection (`rkhunter`, `chkrootkit`)
+### 7.6 Host intrusion detection (`ossec`)
+### 7.7 App intrusion detection (`fail2ban`)
+### 7.8 File system integrity monitoring (`aide`)
+
+## Chapter 99: Optional extras
+
+There are a lot more things you can do to tighten up a server, but they are a little more opinionated.
+
+- You *can* use disk encryption, but that only helps if someone breaks in and steals your PC;
+- You *may be able to* create separate partitions for `/home`, `/var`, etc., but VPS images may install automatically, preventing this;
+- You *could* set a password reset age, but with a sufficiently long password will this really help?
+- And many more.
+
+Here are some useful extra avenues with their benefits and drawbacks.
+
+### 99.1 Disk encryption
+
+#TODO
+
+### 99.2 Separate partitions
