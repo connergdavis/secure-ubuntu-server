@@ -30,9 +30,9 @@ Create SSH key login for local machine.
 Tweak `sshd`'s configuration to provide much better security.
 
   - [Create SSH group](#create-ssh-group)
-  - [Edit `/etc/ssh/sshd_config`](#edit-etcsshsshdconfig)
-  - [Check for errors in `sshd_config`](check-for-errors-in-sshdconfig)
-  - [Only use long Diffie-Hellman moduli](only-use-long-diffiehellman-moduli)
+  - [Edit `/etc/ssh/sshd_config`](#edit-etcsshsshd_config)
+  - [Check for errors in `sshd_config`](check-for-errors-in-sshd_config)
+  - [Only use long Diffie-Hellman moduli](only-use-long-diffie-hellman-moduli)
 
 ### Chapter 3: [Firewall](#firewall)
 
@@ -49,7 +49,7 @@ Use `ufw` to switch to a block-by-default policy, selecting exactly what is allo
 
 Please note NTP requires a port to be open, which is specified in **Chapter 3: Firewall**.
 
-  - [Edit `/etc/ntp.conf`](#edit-editntpconf)
+  - [Edit `/etc/ntp.conf`](#edit-etcntpconf)
   - [Restart service](#restart-service)
 
 ### Chapter 5: [Email logging](#email-logging)
