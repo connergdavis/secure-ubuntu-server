@@ -2,28 +2,72 @@
 
 ## Table of Contents
 
-0. [Beginning](#before-beginning)
+### Chapter 0: [Beginning](#beginning)
+
+Update, create secure sudo user, and disable root access.
+
   - [SSH to root account](#ssh-to-root-account)
   - [Update Ubuntu packagers](#update-ubuntu-packages)
   - [Create secure password](#create-secure-password)
   - [Create sudo user](#create-sudo-user)
   - [Limit `su` command](#limit-su-command)
-1. [SSH](#ssh)
+  - [Disable root user](#disable-root-user)
+
+### Chapter 1: [SSH](#ssh)
+
+Create SSH key login for local machine.
+
+**Note**: `id_some`, `id_some.pub`, and `config` all belong on local machine. Server only needs `authorized_keys`.
+
   - [Generate SSH key](#generate-ssh-key)
   - [Set safer permissions](#set-safer-permissions)
   - [Create alias](#create-alias)
   - [Authorize local machine](#authorize-local-machine)
   - [Login with SSH key](#login-with-ssh-key)
-  - [Disable root user](#disable-root-user)
-2. [Harden SSH](#harden-ssh)
+
+### Chapter 2: [Harden SSH](#harden-ssh)
+
+Tweak `sshd`'s configuration to provide much better security.
+
   - [Create SSH group](#create-ssh-group)
-  - [Edit `/etc/ssh/sshd_config`](#edit-)
-  - [Check for errors in `sshd_config`]()
-  - [Only use long Diffie-Helman moduli]()
+  - [Edit `/etc/ssh/sshd_config`](#edit-etcsshsshdconfig)
+  - [Check for errors in `sshd_config`](check-for-errors-in-sshdconfig)
+  - [Only use long Diffie-Hellman moduli](only-use-long-diffiehellman-moduli)
+
+### Chapter 3: [Firewall](#firewall)
+
+Use `ufw` to switch to a block-by-default policy, selecting exactly what is allowed in and out.
+
+  - [Block everything by default in `ufw`](#block-everything-by-default-in-ufw)
+  - [Allow services out](#allow-services-out)
+  - [Allow services in](#allow-services-in)
+  - [Enable UFW](#enable-ufw)
+
+### Chapter 4: [NTP](#ntp)
+
+**Network Time Protocol** uses global servers to update system time. Servers rely on accurate system time.
+
+Please note NTP requires a port to be open, which is specified in **Chapter 3: Firewall**.
+
+  - [Edit `/etc/ntp.conf`](#edit-editntpconf)
+  - [Restart service](#restart-service)
+
+### Chapter 5: [Email logging](#email-logging)
+
+Before adding Logwatch and other logging services, make sure server can send email.
+
+Please note exim4 requires a port to be open, which is specified in **Chapter 3: Firewall**.
+
+  - [Install exim4](#install-exim4)
+  - [Send test email](#send-test-email)
+
+#### 
 
 ## Beginning
 
-### SSH to root account
+Update, create secure sudo user, and disable root access.
+
+#### SSH to root account
 
 Begin on a trusted local device.
 
@@ -52,15 +96,28 @@ addgroup sudo # Create group for sudoers (only for this account)
 adduser $NEWUSER # Create new user
 usermod -a -G sudo $NEWUSER # Add user to sudoers group
 passwd $NEWUSER # Update their password
+su - $NEWUSER # Login to new account
+```
+
+### Limit `su` command
+
+With a `sudo` user now in place, limit use of `su` to just them.
+
+```bash
+sudo addgroup suers
+sudo usermod -a -G suers $USER
+sudo dpkg-statoverride --update --add root suers 4750 /bin/su
 ```
 
 ## SSH
 
-Start by creating another terminal on local machine.
+Create SSH key login for local machine.
+
+**Note**: `id_some`, `id_some.pub`, and `config` all belong on local machine. Server only needs `authorized_keys`.
 
 ### Generate SSH key
 
-I recommend creating an email address for the server, especially since logs will be emailed too.
+Create an email address for the server, especially since logs will be emailed too.
 
 *Note: When prompted, "Enter a file in which to save the key", provide path: `/home/$USER/.ssh/id_some` where `some` is anything.*
 
@@ -75,8 +132,8 @@ ssh-add ~/.ssh/id_some # Register new keypair with sshd
 
 ```bash
 chmod 644 ~/.ssh/id_some.pub # Limit public key access
-chmod 600 ~/.ssh/id_some # Limit private key
-chmod 700 ~/.ssh # Limit surrounding ~/.ssh folder
+chmod 600 ~/.ssh/id_some
+chmod 700 ~/.ssh
 ```
 
 ### Create alias
@@ -88,6 +145,7 @@ MY_ALIAS=some # `ssh some` to connect
 MY_IP=127.0.0.1 # Server IP
 touch ~/.ssh/config
 echo $'Host $MY_ALIAS\n\tUser $NEWUSER\n\tHostName $MY_IP\n\tPort 22\n\tIdentityFile ~/.ssh/id_some' > ~/.ssh/config
+chmod 600 ~/.ssh/config
 ```
 
 ### Copy public key
@@ -114,6 +172,8 @@ chmod 600 ~/.ssh/authorized_keys
 ssh some
 ```
 
+## Harden SSH
+
 ### Disable root user
 
 Now that a sudo user exists and can login with SSH, there's no need for the root user.
@@ -123,8 +183,6 @@ Now that a sudo user exists and can login with SSH, there's no need for the root
 ```bash
 sudo usermod -s /bin/false root
 ```
-
-## Harden SSH
 
 ### Create SSH group
 
@@ -146,7 +204,8 @@ The SSH configuration file.
 *Also note: If setting `Port #`, closed firewalls will block this port until it is opened. Default SSH port is generally already open. This guide illustrates how to open the port, but closing connection prior might lock the keys forever.*
 
 ```bash
-# ++++ The following are recommendations by me
+# ++++ The following are recommendations by the guide
+# ++++ See https://github.com/connergdavis/secure-ubuntu-server
 
 # Only allow `sshers`, which currently only contains sudo user
 AllowGroups sshers
@@ -176,7 +235,7 @@ Port 54321
 X11Forwarding no
 
 # ---- The following are recommendations by Mozilla
-# ---- See https://infosec.mozilla.org/guidelines/openssh#modern-openssh-67 for latest recommendations
+# ---- See https://infosec.mozilla.org/guidelines/openssh#modern-openssh-67
 
 # Supported HostKey algorithms by order of preference.
 HostKey /etc/ssh/ssh_host_ed25519_key
@@ -229,4 +288,80 @@ sudo awk '$5 >= 3071' /etc/ssh/moduli | sudo tee /etc/ssh/moduli.tmp
 sudo mv /etc/ssh/moduli.tmp /etc/ssh/moduli
 ```
 
-Optionally, consider meeting [Mozilla recommendations for SSH *client* on local machine](https://infosec.mozilla.org/guidelines/openssh#configuration-1).
+Optionally, consider also meeting [Mozilla recommendations for SSH *client* on local machine](https://infosec.mozilla.org/guidelines/openssh#configuration-1).
+
+## Firewall
+
+Switch to a block-by-default policy, selecting exactly what is allowed in and out.
+
+### Block everything by default in `ufw`
+
+```bash
+sudo apt install ufw
+sudo ufw default deny outgoing
+sudo ufw default deny incoming
+```
+
+### Allow services out
+
+The format of simple port rules is `allow/deny` `in/out` `port`. This can be more complex if restricting IPs, for example.
+
+```bash
+sudo ufw allow out 53 comment 'DNS' # A universal need
+sudo ufw allow out 123 comment 'NTP' # Required to use NTP as described in the guide
+sudo ufw allow out 465/tcp comment 'exim4' # Required to send email via exim4
+
+# The following are generally required to do `apt update`
+sudo ufw allow out http comment 'HTTP'
+sudo ufw allow out https comment 'HTTPS'
+sudo ufw allow out ftp comment 'FTP'
+sudo ufw allow out whois comment 'WHOIS'
+```
+
+### Allow services in
+
+*Note: SSH connections are set to `limit` instead of `allow` to use UFW's built in rate-limiting to prevent attacks.*
+
+```bash
+sudo ufw limit in 54321 comment 'SSH' # Replace 54321 by custom SSH port, or ssh if using default
+```
+
+### Enable UFW
+
+**Before proceeding**, open another SSH connection. `ufw enable` will close current SSH terminal if rules were set incorrectly.
+
+```bash
+sudo ufw enable
+sudo ufw status
+```
+
+## NTP
+
+**Network Time Protocol** uses global servers to update system time. Servers rely on accurate system time.
+
+### Edit `/etc/ntp.conf`
+
+Optionally, make the changes by commenting out lines beginning with `server` or `pool`, and add `pool pool.ntp.org iburst` to the end on a new line.
+
+```bash
+sudo sed -i -r -e "s/^((server|pool).*)/# \1         # $(whoami) did this on $(date +"%Y-%m-%d %H:%M:%S")" /etc/ntp.conf
+echo -e "\npool pool.ntp.org iburst         # $(whoami) did this on $(date +"%Y-%m-%d %H:%M:%S")" /etc/ntp.conf | sudo tee -a /etc/ntp.conf
+```
+
+### Restart service
+
+To catch errors should they come up.
+
+```bash
+sudo service ntp restart # Restarts NTP service, which is running constantly in background
+sudo service ntp status # Checks on status of service with latest stdout, will report errors
+sudo ntpq -p # Prints NTP peer status
+```
+
+## Email logging
+
+Before adding Logwatch and other logging services, make sure server can send email.
+
+Please note exim4 requires a port to be open, which is specified in **Chapter 3: Firewall**.
+
+
