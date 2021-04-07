@@ -1,4 +1,13 @@
 # Secure Ubuntu Server
+## Disclaimer
+**I am not a security professional nor do I have any background in security.**
+
+I am a software engineer who wants to run personal servers secure enough for the real world.
+
+I am not a master or even remotely experienced in the following topics. I gathered knowledge from free online sources and researched what things mean enough for my own understanding.
+
+The following suggestions might not work for you. If something goes wrong, please let us know via [Issues](https://github.com/connergdavis/secure-ubuntu-server/issues)!
+
 ## Table of Contents
 ### Chapter 0: [Beginning](#chapter-0-beginning-1)
 Update, create secure sudo user, and disable root access.
