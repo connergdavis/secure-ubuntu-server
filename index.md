@@ -1,6 +1,6 @@
 # Secure Ubuntu Server
 ## Table of Contents
-### Chapter 0: [Beginning](#beginning)
+### Chapter 0: [Beginning](#chapter-0-beginning-1)
 Update, create secure sudo user, and disable root access.
 
   - 0.0 [SSH to root account](#00-ssh-to-root-account)
@@ -10,7 +10,7 @@ Update, create secure sudo user, and disable root access.
   - 0.4 [Limit `su` command](#04-limit-su-command)
   - 0.5 [Disable root user](#05-disable-root-user)
 
-### Chapter 1: [Local SSH](#local-ssh)
+### Chapter 1: [Local SSH](#chapter-1-local-ssh-1)
 Create SSH key login for local machine.
 
 **Note**: `id_some`, `id_some.pub`, and `config` all belong on local machine. Server only needs `authorized_keys`.
@@ -21,7 +21,7 @@ Create SSH key login for local machine.
   - 1.3 [Authorize local machine](#13-authorize-local-machine)
   - 1.4 [Login with SSH key](#14-login-with-ssh-key)
 
-### Chapter 2: [SSH](#ssh)
+### Chapter 2: [SSH](#chapter-2-ssh-1)
 Tweak `sshd`'s configuration to provide much better security.
 
   - 2.0 [Create SSH group](#20-create-ssh-group)
@@ -29,7 +29,7 @@ Tweak `sshd`'s configuration to provide much better security.
   - 2.2 [Check for errors in `sshd_config`](#22-check-for-errors-in-sshd_config)
   - 2.3 [Only use long Diffie-Hellman moduli](#23-only-use-long-diffie-hellman-moduli)
 
-### Chapter 3: [Firewall](#firewall)
+### Chapter 3: [Firewall](#chapter-3-firewall-1)
 Use `ufw` to switch to a block-by-default policy, selecting exactly what is allowed in and out.
 
   - 3.0 [Block everything by default in `ufw`](#30-block-everything-by-default-in-ufw)
@@ -37,15 +37,15 @@ Use `ufw` to switch to a block-by-default policy, selecting exactly what is allo
   - 3.2 [Allow services in](#32-allow-services-in)
   - 3.3 [Enable UFW](#33-enable-ufw)
 
-### Chapter 4: [NTP](#ntp)
-Sync server to Internet time with **Network Time Protocol**. Servers rely on accurate system time.
+### Chapter 4: [NTP](#chapter-4-ntp-1)
+Network Time Protocol uses global servers to update system time. Servers rely on accurate system time.
 
 *Note: NTP requires a port to be open, which is specified in Chapter 3: Firewall.*
 
   - 4.0 [Edit `/etc/ntp.conf`](#40-edit-etcntpconf)
   - 4.1 [Restart service](#41-restart-service)
 
-### Chapter 5: [Email](#email)
+### Chapter 5: [Email](#chapter-5-email-1)
 Setup outgoing mail server to Gmail account. Chapters after this one offer or require the ability to send mail.
 
 *Note: exim4 requires a port to be open, which is specified in Chapter 3: Firewall.*
@@ -53,14 +53,14 @@ Setup outgoing mail server to Gmail account. Chapters after this one offer or re
   - 5.0 [Install mail server (`exim4`)](#50-install-mail-server-exim4) # TODO
   - 5.1 [Send test email](#51-send-test-email) # TODO
 
-### Chapter 6: [File systems](#file-systems)
+### Chapter 6: [File systems](#chapter-6-file-systems-1)
 Limit access to `/proc` and `/home` directories, and set default file and folder permissions.
 
   - 6.0 [Hide pids in `/proc`](#60-hide-pids-in-proc) # TODO
   - 6.1 [Limit `/home` permissions](#61-limit-home-permissions) # TODO
   - 6.2 [Set default permissions](#62-set-default-permissions) # TODO
 
-### Chapter 7: [Reports](#reports)
+### Chapter 7: [Reports](#chapter-7-reports-1)
 Run scans for viruses, monitor intrusions, and more. Email results in human-readable format ondemand and daily.
 
   - 7.0 [Daily reports about everything (`logwatch`)](#70-daily-reports-about-everything-logwatch)
@@ -73,26 +73,37 @@ Run scans for viruses, monitor intrusions, and more. Email results in human-read
   - 7.7 [File system integrity monitoring (`aide`)](#77-file-system-integrity-monitoring-aide)
   - 7.8 [ARP monitoring (`arpwatch`)](#78-arp-monitoring-arpwatch)
 
-### Chapter 8: [Kernel](#kernel)
+### Chapter 8: [Kernel `sysctl`](#chapter-8-kernel-sysctl-1)
+Edit `/etc/sysctl.conf` kernel options to comply with stricter security standards.
 
+  - 8.0 [Edit `/etc/sysctl.conf`](#80-edit-etcsysctlconf)
+  - 8.1 [Test new settings](#81-test-new-settings)
+  - 8.2 [Restart server](#82-restart-server)
 
-### Chapter 9: [Services](#services)
+### Chapter 9: [Services](#chapter-9-services-1)
+TODO
 
+### Chapter 10: [Sandboxes](#chapter-10-sandboxes-1)
+Isolate programs in their own virtual machine to limit access to real resources. The guide uses Firejail, but Docker is a great alternative.
 
-### Chapter 10: [Sandboxes](#sandboxes)
+  - 10.0 [Install `firejail`](#100-install-firejail)
+  - 10.1 [Run programs with `firejail`](#101-run-programs-with-firejail)
+  - 10.2 [Create profiles for programs in `firejail`](#102-create-profiles-for-programs-in-firejail)
 
+### Chapter 11: [Audit](#chapter-11-audit-1)
+Check the security of the server by running standardized audit software to report common weaknesses.
 
-### Chapter 11: [Audit](#audit)
+  - 11.0 [`lynis`](#110-lynis)
 
-
-### Chapter 98: [Keep local system safe](#keep-local-system-safe)
+### Chapter 98: [Keep local system safe](#chapter-98-keep-local-system-safe-1)
 It's fun to set up a `firejail` for every process and receive daily reports about file system integrity, but none of that matters if the local machine used to connect is breached. The SSH key and sudoer password are essential to the security of the system. Systems used to connect should ideally be just as safe as the server itself.
 
-### Chapter 99: [Optional extras](#optional-extras)
+### Chapter 99: [Optional extras](#chapter-99-optional-extras-1)
 There's all sorts of other things to do beyond the scope of this guide. It's just a starting point.
 
-  - 99.0 [Disk encryption](#disk-encryption)
-  - 99.1 [Separate partitions](#separate-partitions)
+  - 99.0 [Disk encryption](#990-disk-encryption)
+  - 99.1 [Separate partitions](#991-separate-partitions)
+  - 99.2 [Good password policy](#992-good-password-policy)
 
 ## Chapter 0: Beginning
 Update, create secure sudo user, and disable root access.
@@ -414,11 +425,49 @@ Run scans for viruses, monitor intrusions, and more. Email results in human-read
 ### 7.7 File system integrity monitoring (`aide`)
 
 
+## Chapter 8: Kernel `sysctl`
+Edit `/etc/sysctl.conf` kernel options to comply with stricter security standards.
+
+### 8.0 Edit `/etc/sysctl.conf`
+
+
+### 8.1 Test new settings
+
+
+### 8.2 Restart server
+
+
+## Chapter 9: Services
+TODO
+
+## Chapter 10: Sandboxes
+Isolate programs in their own virtual machine to limit access to real resources. The guide uses Firejail, but Docker is a great alternative.
+
+### 10.0 Install `firejail`
+
+
+### 10.1 Run programs with `firejail`
+
+
+### 10.2 Create profiles for programs in `firejail`
+
+
+## Chapter 11: Audit
+Check the security of the server by running standardized audit software to report common weaknesses.
+
+### 11.0 `lynis`
+
 ## Chapter 98: Keep local system safe
 It's fun to set up a `firejail` for every process and receive daily reports about file system integrity, but none of that matters if the local machine used to connect is breached. The SSH key and sudoer password are essential to the security of the system. Systems used to connect should ideally be just as safe as the server itself.
 
 ## Chapter 99: Optional extras
 There's all sorts of other things to do beyond the scope of this guide. It's just a starting point.
 
-  - 99.0 [Disk encryption](#disk-encryption)
-  - 99.1 [Separate partitions](#separate-partitions)
+### 99.0 Disk encryption
+
+
+### 99.1 Separate partitions
+
+
+### 99.2 Good password policy
+
