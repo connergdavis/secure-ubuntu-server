@@ -88,8 +88,9 @@ Setup outgoing mail server to Gmail account. Chapters after this one offer or re
   - 5.3 [Secure password file](#53-secure-password-file)
   - 5.4 [Create login certificate](#54-create-login-certificate)
   - 5.5 [Login to Gmail](#55-login-to-gmail)
-  - 5.6 [Restart `exim4`](#56-restart-exim4)
-  - 5.7 [Send test email](#57-send-test-email)
+  - 5.6 [Edit `/etc/aliases`](#56-edit-etcaliases)
+  - 5.6 [Restart `exim4`](#57-restart-exim4)
+  - 5.7 [Send test email](#58-send-test-email)
 
 ### Chapter 6: [File systems](#chapter-6-file-systems-1)
 Limit access to `/proc` and `/home` directories, and set default file and folder permissions.
@@ -102,21 +103,24 @@ Limit access to `/proc` and `/home` directories, and set default file and folder
 Run scans for viruses, monitor intrusions, and more. Email results in human-readable format ondemand and daily.
 
   - 7.0 [Daily reports about everything (`logwatch`)](#70-daily-reports-about-everything-logwatch)
-  - 7.1 [Process accounting (`acct`)](#71-process-accounting-acct)
-  - 7.2 [Automatic updates (`unattended-upgrades`)](#72-automatic-updates-unattended-upgrades)
-  - 7.3 [Antivirus (`clamav`)](#73-antivirus-clamav)
-  - 7.4 [Rootkit detection (`rkhunter`, `chkrootkit`)](#74-rootkit-detection-rkhunter-chkrootkit)
-  - 7.5 [Host intrusion detection (`ossec`)](#75-host-intrusion-detection-ossec)
-  - 7.6 [App intrusion detection (`fail2ban`)](#76-app-intrusion-detection-fail2ban)
-  - 7.7 [File system integrity monitoring (`aide`)](#77-file-system-integrity-monitoring-aide)
-  - 7.8 [ARP monitoring (`arpwatch`)](#78-arp-monitoring-arpwatch)
+  - 7.1 [Automatic updates (`unattended-upgrades`)](#71-automatic-updates-unattended-upgrades)
+  - 7.2 [Antivirus (`clamav`)](#72-antivirus-clamav)
+  - 7.3 [Rootkit detection (`rkhunter`, `chkrootkit`)](#73-rootkit-detection-rkhunter-chkrootkit)
+    - 7.3.0 [Install packages](#730-install-packages)
+    - 7.3.1 [Enable cron scripts](#731-enable-cron-scripts)
+    - 7.3.2 [Edit `/etc/rkhunter.conf`](#732-edit-etcrkhunterconf)
+    - 7.3.3 [Update `rkhunter`](#733-update-rkhunter)
+  - 7.4 [Host intrusion detection (`ossec`)](#74-host-intrusion-detection-ossec) #TODO
+  - 7.5 [App intrusion detection (`fail2ban`)](#75-app-intrusion-detection-fail2ban) #TODO
+  - 7.6 [File system integrity monitoring (`aide`)](#76-file-system-integrity-monitoring-aide) #TODO
+  - 7.7 [ARP monitoring (`arpwatch`)](#77-arp-monitoring-arpwatch) #TODO
 
 ### Chapter 8: [Kernel `sysctl`](#chapter-8-kernel-sysctl-1)
 Edit `/etc/sysctl.conf` kernel options to comply with stricter security standards.
 
-  - 8.0 [Edit `/etc/sysctl.conf`](#80-edit-etcsysctlconf)
-  - 8.1 [Test new settings](#81-test-new-settings)
-  - 8.2 [Restart server](#82-restart-server)
+  - 8.0 [Edit `/etc/sysctl.conf`](#80-edit-etcsysctlconf) #TODO
+  - 8.1 [Test new settings](#81-test-new-settings) #TODO
+  - 8.2 [Restart server](#82-restart-server) #TODO
 
 ### Chapter 9: [Services](#chapter-9-services-1)
 TODO
@@ -124,14 +128,14 @@ TODO
 ### Chapter 10: [Sandboxes](#chapter-10-sandboxes-1)
 Isolate programs in their own virtual machine to limit access to real resources. The guide uses Firejail, but Docker is a great alternative.
 
-  - 10.0 [Install `firejail`](#100-install-firejail)
-  - 10.1 [Run programs with `firejail`](#101-run-programs-with-firejail)
-  - 10.2 [Create profiles for programs in `firejail`](#102-create-profiles-for-programs-in-firejail)
+  - 10.0 [Install `firejail`](#100-install-firejail) #TODO
+  - 10.1 [Run programs with `firejail`](#101-run-programs-with-firejail) #TODO
+  - 10.2 [Create profiles for programs in `firejail`](#102-create-profiles-for-programs-in-firejail) #TODO
 
 ### Chapter 11: [Audit](#chapter-11-audit-1)
 Check the security of the server by running standardized audit software to report common weaknesses.
 
-  - 11.0 [`lynis`](#110-lynis)
+  - 11.0 [`lynis`](#110-lynis) #TODO
 
 ### Chapter 98: [Keep local system safe](#chapter-98-keep-local-system-safe-1)
 It's fun to set up a `firejail` for every process and receive daily reports about file system integrity, but none of that matters if the local machine used to connect is breached. The SSH key and sudoer password are essential to the security of the system. Systems used to connect should ideally be just as safe as the server itself.
@@ -139,9 +143,10 @@ It's fun to set up a `firejail` for every process and receive daily reports abou
 ### Chapter 99: [Optional extras](#chapter-99-optional-extras-1)
 There's all sorts of other things to do beyond the scope of this guide. It's just a starting point. Some feature may provide more security at the cost of being too inconvenient. For example, good password policy on a personal server is pointless. Some features may not be possible on virtual private server providers, like disk encryption.
 
-  - 99.0 [Disk encryption](#990-disk-encryption)
-  - 99.1 [Separate partitions](#991-separate-partitions)
-  - 99.2 [Good password policy](#992-good-password-policy)
+  - 99.0 [Disk encryption](#990-disk-encryption) #TODO
+  - 99.1 [Separate partitions](#991-separate-partitions) #TODO
+  - 99.2 [Good password policy](#992-good-password-policy) #TODO
+  - 99.3 [Process accounting](#993-process-accounting) #TODO
 
 ## Chapter 0: Beginning
 Update, create secure sudo user, and disable root access.
@@ -490,18 +495,26 @@ sudo sed -i -r -e '/^.ifdef REMOTE_SMTP_SMARTHOST_HOSTS_REQUIRE_TLS$/I { :a; n; 
 sudo sed -i -r -e "/\.ifdef MAIN_TLS_ENABLE/ a\n .ifdef TLS_ON_CONNECT_PORTS\n tls_on_connect_ports = TLS_ON_CONNECT_PORTS\n.endif\n" /etc/exim4/exim4.conf.template
 ```
 
-### 5.6 Restart `exim4`
+### 5.6 Edit `/etc/aliases`
+
+To avoid copying the email address to every application that will send mail, overwrite the `root` mail alias. It's just good practice in case this address needs to change.
+
+```bash
+root: address@gmail.com
+```
+
+### 5.7 Restart `exim4`
 
 ```bash
 sudo update-exim4.conf
 sudo service exim4 restart
 ```
 
-### 5.7  Send test email
+### 5.8  Send test email
 
 ```bash
 echo "Test" | mail -s "Test" address@gmail.com
-sudo tail /var/log/exim4/mainlog
+sudo tail /var/log/exim4/mainlog # Read log results, especially if the test doesn't work!
 ```
 
 ## Chapter 6: File systems
@@ -527,18 +540,133 @@ Run scans for viruses, monitor intrusions, and more. Email results in human-read
 
 ### 7.0 Daily reports about everything (`logwatch`)
 
+Logwatch is an extremely convenient tool that creates a human readable compilation of reports based on what's found in `/var/log`. By default, Logwatch includes things like disk and network usage and SSH traffic. Notably, Logwatch includes log file filters, e.g. SSH failed connections are printed as one line per user.
 
-### 7.1 Process accounting (`acct`)
+```bash
+sudo apt install logwatch
+# Change Logwatch cron entry to send daily report as email
+sudo sed -i -r -e "s,^($(sudo which logwatch).*?),# \1\n$(sudo which logwatch) --output mail --format html --mailto root --range yesterday --service all," /etc/cron.daily/00logwatch
+sudo /etc/cron.daily/00logwatch # Test if successful
+```
 
+### 7.1 Automatic updates (`unattended-upgrades`)
 
-### 7.2 Automatic updates (`unattended-upgrades`)
+#### 7.1.0 Install `unattended-upgrades`
 
+```bash
+sudo apt install unattended-upgrades apt-listchanges apticron
+sudo touch /etc/apt/apt.conf.d/51myunattended-upgrades
+```
 
-### 7.3 Antivirus (`clamav`)
+#### 7.1.1 Edit `/etc/apt/apt.conf.d/51myunattended-upgrades`
 
+Configure `unattended-upgrades` to email automatic update results.
 
-### 7.4 Rootkit detection (`rkhunter`, `chkrootkit`)
+```
+// Enable the update/upgrade script (0=disable)
+APT::Periodic::Enable "1";
 
+// Do "apt-get update" automatically every n-days (0=disable)
+APT::Periodic::Update-Package-Lists "1";
+
+// Do "apt-get upgrade --download-only" every n-days (0=disable)
+APT::Periodic::Download-Upgradeable-Packages "1";
+
+// Do "apt-get autoclean" every n-days (0=disable)
+APT::Periodic::AutocleanInterval "7";
+
+// Send report mail to root
+//     0:  no report             (or null string)
+//     1:  progress report       (actually any string)
+//     2:  + command outputs     (remove -qq, remove 2>/dev/null, add -d)
+//     3:  + trace on    APT::Periodic::Verbose "2";
+APT::Periodic::Unattended-Upgrade "1";
+
+// Automatically upgrade packages from these
+Unattended-Upgrade::Origins-Pattern {
+      "o=Debian,a=stable";
+      "o=Debian,a=stable-updates";
+      "origin=Debian,codename=${distro_codename},label=Debian-Security";
+};
+
+// You can specify your own packages to NOT automatically upgrade here
+Unattended-Upgrade::Package-Blacklist {
+};
+
+// Run dpkg --force-confold --configure -a if a unclean dpkg state is detected to true to ensure that updates get installed even when the system got interrupted during a previous run
+Unattended-Upgrade::AutoFixInterruptedDpkg "true";
+
+//Perform the upgrade when the machine is running because we wont be shutting our server down often
+Unattended-Upgrade::InstallOnShutdown "false";
+
+// Send an email to this address with information about the packages upgraded.
+Unattended-Upgrade::Mail "root";
+
+// Always send an e-mail
+Unattended-Upgrade::MailOnlyOnError "false";
+
+// Remove all unused dependencies after the upgrade has finished
+Unattended-Upgrade::Remove-Unused-Dependencies "true";
+
+// Remove any new unused dependencies after the upgrade has finished
+Unattended-Upgrade::Remove-New-Unused-Dependencies "true";
+
+// Automatically reboot WITHOUT CONFIRMATION if the file /var/run/reboot-required is found after the upgrade.
+Unattended-Upgrade::Automatic-Reboot "true";
+
+// Automatically reboot even if users are logged in.
+Unattended-Upgrade::Automatic-Reboot-WithUsers "true";
+```
+
+### 7.2 Antivirus (`clamav`)
+
+The default settings run definitions updates once an hour. `clamav` will automatically scan files.
+
+```bash
+sudo apt install clamav clamav-freshclam clamav-daemon
+sudo service clamav-freshclam start
+sudo service clamav-freshclam status
+```
+
+### 7.3 Rootkit detection (`rkhunter`, `chkrootkit`)
+
+#### 7.3.0 Install packages
+
+```bash
+sudo apt install rkhunter chkrootkit
+```
+
+#### 7.3.1 Enable cron scripts
+
+```bash
+# Select `Yes` when asked, *Should chkrootkit be run automatically every day?* Use default for everything else
+sudo dpkg-reconfigure chkrootkit
+# Select `Yes` for all prompts
+sudo dpkg-reconfigure rkhunter
+```
+
+#### 7.3.2 Edit `/etc/rkhunter.conf`
+
+```
+UPDATE_MIRRORS=1
+MIRRORS_MODE=0
+MAIL-ON-WARNING=root
+COPY_LOG_ON_ERROR=1
+PKGMGR=NONE
+PHALANX_DIRTEST=1
+WEB_CMD=""
+USE_LOCKING=1
+SHOW_SUMMARY_WARNINGS_NUMBER=1
+```
+
+#### 7.3.3 Update `rkhunter`
+
+```bash
+sudo rkhunter -C # Verify /etc/rkhunter.conf
+sudo rkhunter --versioncheck
+sudo rkhunter --update
+sudo rkhunter --propupd
+```
 
 ### 7.5 Host intrusion detection (`ossec`)
 
