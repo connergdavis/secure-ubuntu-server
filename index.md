@@ -58,8 +58,14 @@ Setup outgoing mail server to Gmail account. Chapters after this one offer or re
 
 *Note: exim4 requires a port to be open, which is specified in Chapter 3: Firewall.*
 
-  - 5.0 [Install mail server (`exim4`)](#50-install-mail-server-exim4) # TODO
-  - 5.1 [Send test email](#51-send-test-email) # TODO
+  - 5.0 [Install mail server (`exim4`)](#50-install-mail-server-exim4)
+  - 5.1 [Configure `exim4`](#51-configure-exim4)
+  - 5.2 [Edit `/etc/exim4/passwd.client`](#52-edit-etcexim4passwdclient)
+  - 5.3 [Secure password file](#53-secure-password-file)
+  - 5.4 [Create login certificate](#54-create-login-certificate)
+  - 5.5 [Login to Gmail](#55-login-to-gmail)
+  - 5.6 [Restart `exim4`](#56-restart-exim4)
+  - 5.7 [Send test email](#57-send-test-email)
 
 ### Chapter 6: [File systems](#chapter-6-file-systems-1)
 Limit access to `/proc` and `/home` directories, and set default file and folder permissions.
