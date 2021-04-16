@@ -1,4 +1,4 @@
-# Secure Ubuntu Server
+v# Secure Ubuntu Server
 ## Disclaimer
 **I am not a security professional nor do I have any background in security.**
 
@@ -17,7 +17,6 @@ Update, create secure sudo user, and disable root access.
   - 0.2 [Create secure password](#02-create-secure-password)
   - 0.3 [Create sudo user](#03-create-sudo-user)
   - 0.4 [Limit `su` command](#04-limit-su-command)
-  - 0.5 [Disable root user](#05-disable-root-user)
 
 ### Chapter 1: [Local SSH](#chapter-1-local-ssh-1)
 Create SSH key login for local machine.
@@ -137,7 +136,7 @@ A password manager should ideally be used to control server passwords. We want p
 By default, `sudo` gives users in the group `sudo` full permission. It may not exist yet, that's OK.
 
 ```bash
-NEWUSER=`openssl rand -hex 12` # Create random username
+NEWUSER=`openssl rand -hex 12` # Create random username, or use a memorable name if you like
 addgroup sudo # Create group for sudoers (only for this account)
 adduser $NEWUSER # Create new user
 usermod -a -G sudo $NEWUSER # Add user to sudoers group
@@ -160,7 +159,7 @@ Create SSH key login for local machine.
 **Note**: `id_some`, `id_some.pub`, and `config` all belong on local machine. Server only needs `authorized_keys`.
 
 ### 1.0 Generate SSH key
-Create an email address for the server, especially since logs will be emailed too.
+Create an email address for the server, rather than using a personal email, especially since logs will be emailed too.
 
 *Note: When prompted, "Enter a file in which to save the key", provide path: `/home/$USER/.ssh/id_some` where `some` is anything.*
 
@@ -391,9 +390,89 @@ Setup outgoing mail server to Gmail account. Chapters after this one offer or re
 
 ### 5.0 Install mail server (`exim4`)
 
+`openssl` and `ca-certificates` are also needed to log into Gmail servers.
 
-### 5.1  Send test email
+```bash
+sudo apt install exim4 openssl ca-certificates
+```
 
+### 5.1 Configure `exim4`
+
+When prompted, continue with the default setting for all but the following options:
+
+| Please enter | ... |
+| -- | -- |
+| **General type of mail configuration** | `mail sent by smarthost; no local mail` |
+| **System mail name** | `localhost` |
+| **Visible domain name for local users** | `localhost` |
+| **IP-address or host name of the outgoing smarthost** | `smtp.gmail.com::465` |
+
+```bash
+sudo dpkg-reconfigure exim4-config
+```
+
+### 5.2 Edit `/etc/exim4/passwd.client`
+
+Provide login credentials so `exim4` can send email from your account to itself.
+
+```bash
+smtp.gmail.com:address@gmail.com:password
+*.google.com:address@gmail.com:password
+```
+
+### 5.3 Secure password file
+
+`Debian-exim` is the default group used by `exim4` to send mail.
+
+```bash
+sudo chown root:Debian-exim /etc/exim4/passwd.client
+sudo chmod 640 /etc/exim4/passwd.client
+```
+
+### 5.4 Create login certificate
+
+Create a TLS certificate `exim4` can use to login to Gmail servers.
+
+When prompted, provide the following specific answers:
+
+| []: | .. |
+| -- | -- |
+| Server name | `localhost` |
+| Email Address | `email@gmail.com` |
+
+```bash
+sudo bash /usr/share/doc/exim4-base/examples/exim-gencert
+```
+
+### 5.5 Login to Gmail
+
+Finally, configure `exim4` to connect to Gmail servers using your account.
+
+```bash
+cat << EOF | sudo tee /etc/exim4/exim4.conf.localmacros
+MAIN_TLS_ENABLE = 1
+REMOTE_SMTP_SMARTHOST_HOSTS_REQUIRE_TLS = *
+TLS_ON_CONNECT_PORTS = 465
+REQUIRE_PROTOCOL = smtps
+IGNORE_SMTP_LINE_LENGTH_LIMIT = true
+EOF
+sudo sed -i -r -e '/^.ifdef REMOTE_SMTP_SMARTHOST_HOSTS_REQUIRE_TLS$/I { :a; n; /^.endif$/!ba; a\n .ifdef REQUIRE_PROTOCOL\nprotocol = REQUIRE_PROTOCOL\n .endif\n' -e '}' /etc/exim4/exim4.conf.template
+sudo sed -i -r -e "/\.ifdef MAIN_TLS_ENABLE/ a\n .ifdef TLS_ON_CONNECT_PORTS\n tls_on_connect_ports = TLS_ON_CONNECT_PORTS\n.endif\n" /etc/exim4/exim4.conf.template
+```
+
+### 5.6 Restart `exim4`
+
+```bash
+sudo update-exim4.conf
+sudo service exim4 restart
+```
+
+### 5.7  Send test email
+
+```bash
+echo "Test" | mail -s "Test" address@gmail.com
+sudo tail /var/log/exim4/mainlog
+```
 
 ## Chapter 6: File systems
 Limit access to `/proc` and `/home` directories, and set default file and folder permissions.
