@@ -8,6 +8,30 @@ I am not a master or even remotely experienced in the following topics. I gather
 
 The following suggestions might not work for you. If something goes wrong, please let us know via [Issues](https://github.com/connergdavis/secure-ubuntu-server/issues)!
 
+## References
+
+### General Security Guides
+
+- [github: imthenachoman/How-To-Secure-A-Linux-Server](https://github.com/imthenachoman/How-To-Secure-A-Linux-Server)
+- [Security hardening Red Hat Enterprise Linux](https://access.redhat.com/documentation/en-us/red_hat_enterprise_linux/8/html/security_hardening/index)
+
+### SSH
+
+- [Mozilla InfoSec: Security Guidelines: OpenSSH](https://infosec.mozilla.org/guidelines/openssh.html)
+
+### Firewall
+
+- [Security - Firewall | Ubuntu](https://ubuntu.com/server/docs/security-firewall)
+- [How To Set Up a Firewall with UFW on Ubuntu 18.04](https://www.digitalocean.com/community/tutorials/how-to-set-up-a-firewall-with-ufw-on-ubuntu-18-04) (note: no differences on Ubuntu 20)
+
+### File systems
+
+- [Restricting Access to Process Directories](https://access.redhat.com/documentation/en-us/red_hat_enterprise_linux/5/html/deployment_guide/ch-proc#s2-Restricting_Access_to_Process_Directories)
+
+### Web
+
+- [Mozilla InfoSec: Security Guidelines: Web Security](https://infosec.mozilla.org/guidelines/web_security.html)
+
 ## Table of Contents
 ### Chapter 0: [Beginning](#chapter-0-beginning-1)
 Update, create secure sudo user, and disable root access.
@@ -113,7 +137,7 @@ Check the security of the server by running standardized audit software to repor
 It's fun to set up a `firejail` for every process and receive daily reports about file system integrity, but none of that matters if the local machine used to connect is breached. The SSH key and sudoer password are essential to the security of the system. Systems used to connect should ideally be just as safe as the server itself.
 
 ### Chapter 99: [Optional extras](#chapter-99-optional-extras-1)
-There's all sorts of other things to do beyond the scope of this guide. It's just a starting point.
+There's all sorts of other things to do beyond the scope of this guide. It's just a starting point. Some feature may provide more security at the cost of being too inconvenient. For example, good password policy on a personal server is pointless. Some features may not be possible on virtual private server providers, like disk encryption.
 
   - 99.0 [Disk encryption](#990-disk-encryption)
   - 99.1 [Separate partitions](#991-separate-partitions)
@@ -485,12 +509,18 @@ Limit access to `/proc` and `/home` directories, and set default file and folder
 
 ### 6.0 Hide pids in `proc`
 
+Per [`man proc`](https://linux.die.net/man/5/proc), by default there is a readable file for every process running on the system inside `/proc/`, e.g., `/proc/1`.
 
-### 6.1 Limit `/home` permissions
+```bash
+echo -e "\nproc    /proc    proc    defaults,hidepid=2    0    0" | sudo tee -a /etc/fstab
+sudo reboot
+```
 
+### 6.1 Set default permissions
 
-### 6.2 Set default permissions
-
+```bash
+umask u=rwx,g=rx,o= # Sets default permissions for files created going forward
+```
 
 ## Chapter 7: Reports
 Run scans for viruses, monitor intrusions, and more. Email results in human-readable format ondemand and daily.
