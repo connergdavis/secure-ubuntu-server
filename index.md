@@ -95,15 +95,16 @@ Setup outgoing mail server to Gmail account. Chapters after this one offer or re
 ### Chapter 6: [File systems](#chapter-6-file-systems-1)
 Limit access to `/proc` and `/home` directories, and set default file and folder permissions.
 
-  - 6.0 [Hide pids in `/proc`](#60-hide-pids-in-proc) # TODO
-  - 6.1 [Limit `/home` permissions](#61-limit-home-permissions) # TODO
-  - 6.2 [Set default permissions](#62-set-default-permissions) # TODO
+  - 6.0 [Hide pids in `/proc`](#60-hide-pids-in-proc)
+  - 6.1 [Set default permissions](#61-set-default-permissions)
 
 ### Chapter 7: [Reports](#chapter-7-reports-1)
 Run scans for viruses, monitor intrusions, and more. Email results in human-readable format ondemand and daily.
 
   - 7.0 [Daily reports about everything (`logwatch`)](#70-daily-reports-about-everything-logwatch)
   - 7.1 [Automatic updates (`unattended-upgrades`)](#71-automatic-updates-unattended-upgrades)
+    - 7.1.1 [Install `unattended-upgrades`](#711-install-unattended-upgrades)
+    - 7.1.2 [Edit `/etc/apt/apt.conf.d/51myunattended-upgrades`](#712-edit-etcaptaptconfd51myunattended-upgrades)
   - 7.2 [Antivirus (`clamav`)](#72-antivirus-clamav)
   - 7.3 [Rootkit detection (`rkhunter`, `chkrootkit`)](#73-rootkit-detection-rkhunter-chkrootkit)
     - 7.3.0 [Install packages](#730-install-packages)
@@ -424,7 +425,6 @@ Setup outgoing mail server to Gmail account. Chapters after this one offer or re
 *Note: exim4 requires a port to be open, which is specified in Chapter 3: Firewall.*
 
 ### 5.0 Install mail server (`exim4`)
-
 `openssl` and `ca-certificates` are also needed to log into Gmail servers.
 
 ```bash
@@ -432,7 +432,6 @@ sudo apt install exim4 openssl ca-certificates
 ```
 
 ### 5.1 Configure `exim4`
-
 When prompted, continue with the default setting for all but the following options:
 
 | Please enter | ... |
@@ -447,7 +446,6 @@ sudo dpkg-reconfigure exim4-config
 ```
 
 ### 5.2 Edit `/etc/exim4/passwd.client`
-
 Provide login credentials so `exim4` can send email from your account to itself.
 
 ```bash
@@ -456,7 +454,6 @@ smtp.gmail.com:address@gmail.com:password
 ```
 
 ### 5.3 Secure password file
-
 `Debian-exim` is the default group used by `exim4` to send mail.
 
 ```bash
@@ -465,7 +462,6 @@ sudo chmod 640 /etc/exim4/passwd.client
 ```
 
 ### 5.4 Create login certificate
-
 Create a TLS certificate `exim4` can use to login to Gmail servers.
 
 When prompted, provide the following specific answers:
@@ -480,7 +476,6 @@ sudo bash /usr/share/doc/exim4-base/examples/exim-gencert
 ```
 
 ### 5.5 Login to Gmail
-
 Finally, configure `exim4` to connect to Gmail servers using your account.
 
 ```bash
@@ -496,7 +491,6 @@ sudo sed -i -r -e "/\.ifdef MAIN_TLS_ENABLE/ a\n .ifdef TLS_ON_CONNECT_PORTS\n t
 ```
 
 ### 5.6 Edit `/etc/aliases`
-
 To avoid copying the email address to every application that will send mail, overwrite the `root` mail alias. It's just good practice in case this address needs to change.
 
 ```bash
@@ -504,14 +498,12 @@ root: address@gmail.com
 ```
 
 ### 5.7 Restart `exim4`
-
 ```bash
 sudo update-exim4.conf
 sudo service exim4 restart
 ```
 
 ### 5.8  Send test email
-
 ```bash
 echo "Test" | mail -s "Test" address@gmail.com
 sudo tail /var/log/exim4/mainlog # Read log results, especially if the test doesn't work!
@@ -521,7 +513,6 @@ sudo tail /var/log/exim4/mainlog # Read log results, especially if the test does
 Limit access to `/proc` and `/home` directories, and set default file and folder permissions.
 
 ### 6.0 Hide pids in `proc`
-
 Per [`man proc`](https://linux.die.net/man/5/proc), by default there is a readable file for every process running on the system inside `/proc/`, e.g., `/proc/1`.
 
 ```bash
@@ -530,7 +521,6 @@ sudo reboot
 ```
 
 ### 6.1 Set default permissions
-
 ```bash
 umask u=rwx,g=rx,o= # Sets default permissions for files created going forward
 ```
@@ -539,7 +529,6 @@ umask u=rwx,g=rx,o= # Sets default permissions for files created going forward
 Run scans for viruses, monitor intrusions, and more. Email results in human-readable format ondemand and daily.
 
 ### 7.0 Daily reports about everything (`logwatch`)
-
 Logwatch is an extremely convenient tool that creates a human readable compilation of reports based on what's found in `/var/log`. By default, Logwatch includes things like disk and network usage and SSH traffic. Notably, Logwatch includes log file filters, e.g. SSH failed connections are printed as one line per user.
 
 ```bash
@@ -550,16 +539,13 @@ sudo /etc/cron.daily/00logwatch # Test if successful
 ```
 
 ### 7.1 Automatic updates (`unattended-upgrades`)
-
 #### 7.1.0 Install `unattended-upgrades`
-
 ```bash
 sudo apt install unattended-upgrades apt-listchanges apticron
 sudo touch /etc/apt/apt.conf.d/51myunattended-upgrades
 ```
 
 #### 7.1.1 Edit `/etc/apt/apt.conf.d/51myunattended-upgrades`
-
 Configure `unattended-upgrades` to email automatic update results.
 
 ```
@@ -619,7 +605,6 @@ Unattended-Upgrade::Automatic-Reboot-WithUsers "true";
 ```
 
 ### 7.2 Antivirus (`clamav`)
-
 The default settings run definitions updates once an hour. `clamav` will automatically scan files.
 
 ```bash
@@ -629,15 +614,12 @@ sudo service clamav-freshclam status
 ```
 
 ### 7.3 Rootkit detection (`rkhunter`, `chkrootkit`)
-
 #### 7.3.0 Install packages
-
 ```bash
 sudo apt install rkhunter chkrootkit
 ```
 
 #### 7.3.1 Enable cron scripts
-
 ```bash
 # Select `Yes` when asked, *Should chkrootkit be run automatically every day?* Use default for everything else
 sudo dpkg-reconfigure chkrootkit
@@ -646,7 +628,6 @@ sudo dpkg-reconfigure rkhunter
 ```
 
 #### 7.3.2 Edit `/etc/rkhunter.conf`
-
 ```
 UPDATE_MIRRORS=1
 MIRRORS_MODE=0
@@ -660,7 +641,6 @@ SHOW_SUMMARY_WARNINGS_NUMBER=1
 ```
 
 #### 7.3.3 Update `rkhunter`
-
 ```bash
 sudo rkhunter -C # Verify /etc/rkhunter.conf
 sudo rkhunter --versioncheck
@@ -668,26 +648,29 @@ sudo rkhunter --update
 sudo rkhunter --propupd
 ```
 
-### 7.5 Host intrusion detection (`ossec`)
+### 7.4 Host intrusion detection (`ossec`)
+TODO
 
+### 7.5 App intrusion detection (`fail2ban`)
+TODO
 
-### 7.6 App intrusion detection (`fail2ban`)
+### 7.6 File system integrity monitoring (`aide`)
+TODO
 
-
-### 7.7 File system integrity monitoring (`aide`)
-
+### 7.7 ARP monitoring (`arpwatch`)
+TODO
 
 ## Chapter 8: Kernel `sysctl`
 Edit `/etc/sysctl.conf` kernel options to comply with stricter security standards.
 
 ### 8.0 Edit `/etc/sysctl.conf`
-
+TODO
 
 ### 8.1 Test new settings
-
+TODO
 
 ### 8.2 Restart server
-
+TODO
 
 ## Chapter 9: Services
 TODO
