@@ -32,6 +32,8 @@ The following suggestions might not work for you. If something goes wrong, pleas
 
 - [Mozilla InfoSec: Security Guidelines: Web Security](https://infosec.mozilla.org/guidelines/web_security.html)
 
+<hr />
+
 ## Table of Contents
 ### Chapter 0: [Beginning](#chapter-0-beginning-1)
 Update, create secure sudo user, and disable root access.
@@ -149,34 +151,41 @@ There's all sorts of other things to do beyond the scope of this guide. It's jus
   - 99.2 [Good password policy](#992-good-password-policy) #TODO
   - 99.3 [Process accounting](#993-process-accounting) #TODO
 
+<hr />
+
 ## Chapter 0: Beginning
-Update, create secure sudo user, and disable root access.
+### **Objectives**
+&#9745; **Update Ubuntu**<br>
+&#9745; **Create `sudo` user**, a normal user who can execute root commands individually with password verification<br>
+&#9745; **Limit `su` command**, so only admin account can use it
+
+### **Why...**
+**Create `sudo` user**? Using root account means all programs are run by root account. Root lets a program do *anything*, but most programs need very little access. `sudo` can be used before a command to run that command as root,  eliminating the need to login as root.<br>
+**Limit `su` command**? `su` allows users to switch to other accounts including root.
 
 ### 0.0 SSH to root account
-Begin on a trusted local device.
-
 ```bash
-ssh root@127.0.0.1 # 127.0.0.1 is server IP
+ssh root@myserver.net
 ```
 
-### 0.1 Update Ubuntu packages
+### 0.1 Update Ubuntu
 ```bash
 apt update
 apt upgrade
 ```
 
 ### 0.2 Create secure password
-A password manager should ideally be used to control server passwords. We want passwords that are ridiculously difficult to crack and like to isolate different purposes of the server to different accounts (so lots of passwords). 
+Use a password manager to generate a long, unpredictable password for the new `sudo` account.
 
-### 0.3 Create sudo user
-By default, `sudo` gives users in the group `sudo` full permission. It may not exist yet, that's OK.
+### 0.3 Create `sudo` user
+By default, `/etc/ssh/sshd_config` gives members of group `sudo` full permissions: `%sudo	ALL=(ALL:ALL) ALL`.
 
 ```bash
-NEWUSER=`openssl rand -hex 12` # Create random username, or use a memorable name if you like
-addgroup sudo # Create group for sudoers (only for this account)
+NEWUSER=`admin` # Username
+addgroup sudo # Create group for sudoers
 adduser $NEWUSER # Create new user
 usermod -a -G sudo $NEWUSER # Add user to sudoers group
-passwd $NEWUSER # Update their password
+passwd $NEWUSER # Set secure password
 su - $NEWUSER # Login to new account
 ```
 
@@ -186,66 +195,91 @@ With a `sudo` user now in place, limit use of `su` to just them.
 ```bash
 sudo addgroup suers
 sudo usermod -a -G suers $USER
-sudo dpkg-statoverride --update --add root suers 4750 /bin/su
+sudo dpkg-statoverride --update --add root suers 4750 /bin/su # Now `su` can only be run by members of group `suers`
 ```
 
 ## Chapter 1: Local SSH
-Create SSH key login for local machine.
+### **Objectives**
+&#9745; **Generate SSH key** to connect securely to server without password exchange<br>
+&#9745; **Authorize local machine**<br>
+&#9745; **Login with SSH key**
+
+### **Why...**
+**Login with SSH key**? SSH keys are 256 bits, longer than most passwords, and do not need to be sent to the server like a password. Note that SSH keys are stored in `~/.ssh/`: the security of these files on local machine is essential.
 
 **Note**: `id_some`, `id_some.pub`, and `config` all belong on local machine. Server only needs `authorized_keys`.
 
 ### 1.0 Generate SSH key
-Create an email address for the server, rather than using a personal email, especially since logs will be emailed too.
+Take a second to create a Gmail account for the server, rather than using a personal email. **This guide relies on Gmail to send mail**, but it will work on Yahoo, etc. with extra changes.
 
 *Note: When prompted, "Enter a file in which to save the key", provide path: `/home/$USER/.ssh/id_some` where `some` is anything.*
 
 ```bash
-# When prompted, "Enter a file in which to save the key", 
-# provide path: `/home/$USER/.ssh/id_some` where `some` is anything
-ssh-keygen -t ed25519 -C "email@example.com" # Generate SSH keypair
+# When prompted, "Enter a file in which to save the key", provide path: `/home/$USER/.ssh/id_some` where `some` is something memorable
+ssh-keygen -t ed25519 -C "myserver@gmail.com" # Generate SSH keypair
 ssh-add ~/.ssh/id_some # Register new keypair with sshd
 ```
 
 ### 1.1 Set safer permissions
+In Linux, every file has rules for what the (1) user and (2) group who owns the file can do, and what (3) everyone else can do. These comprise the three consecutive numbers in `chmod` commands. For example, `700` gives full access to (1) the owner but no access to (2) the owner's groups or (3) other users - `0` denotes no access, `7` full access.
+
+SSH uses public key cryptography for "SSH keys". This is a huge topic, but the meat is that private key must be protected at all costs, while public key is innocuous.
+
 ```bash
-chmod 644 ~/.ssh/id_some.pub # Limit public key access
-chmod 600 ~/.ssh/id_some
+chmod 644 ~/.ssh/id_some.pub # Limit public key access - someone else reading this is not dangerous
+chmod 600 ~/.ssh/id_some # Lock down private key - this is dangerous
 chmod 700 ~/.ssh
 ```
 
 ### 1.2 Create alias
-Allows connection via `ssh some` instead of `ssh user:ip`.
+Allow connection via `ssh some` instead of `ssh user:ip`.
 
 ```bash
-MY_ALIAS=some # `ssh some` to connect
-MY_IP=127.0.0.1 # Server IP
 touch ~/.ssh/config
-echo $'Host $MY_ALIAS\n\tUser $NEWUSER\n\tHostName $MY_IP\n\tPort 22\n\tIdentityFile ~/.ssh/id_some' > ~/.ssh/config
 chmod 600 ~/.ssh/config
 ```
 
+Edit `~/.ssh/config`:
+
+```
+Host myalias
+  User admin
+  HostName myserver.net
+  Port 22
+  IdentityFile ~/.ssh/id_some
+```
+
 ### 1.3 Copy public key
+**Note**: Ensure trailing whitespace is not included in copy-paste.
+
 ```bash
 cat ~/.ssh/id_some.pub
 ```
 
 ### 1.4 Authorize local machine
-Return to the server SSH terminal to authorize local machine.
+**Note**: Return to server SSH shell for this step.
 
 ```bash
 touch ~/.ssh/authorized_keys
-echo "(public key from clipboard)" > ~/.ssh/authorized_keys
 chmod 600 ~/.ssh/authorized_keys
+echo "(public key from clipboard)" > ~/.ssh/authorized_keys
 ```
 
 ### 1.5 Login with SSH key
-*Note: Close existing SSH to `root` upon success.*
+**Note**: Close existing SSH to `root` upon success.
 
 ```bash
 ssh some
 ```
 
 ## Chapter 2: SSH
+### **Objectives**
+&#9745; **Disable root user** to prevent root login since sudo user can do everything<br>
+&#9745; **Secure `sshd`** to mitigate attacks on SSH, which is always exposed
+
+### **Why...**
+**Login with SSH key**? SSH keys are 256 bits, longer than most passwords, and do not need to be sent to the server like a password. Note that SSH keys are stored in `~/.ssh/`: the security of these files on local machine is essential.
+
 ### 2.0 Disable root user
 Now that a sudo user exists and can login with SSH, there's no need for the root user.
 
@@ -263,7 +297,7 @@ sudo addgroup sshers
 sudo usermod -a -G sshers $USER
 ```
 
-### 2.2 Edit `/etc/ssh/sshd_config`
+### 2.2 Secure `sshd`
 The SSH configuration file.
 
 *Note: See https://infosec.mozilla.org/guidelines/openssh#modern-openssh-67 for latest recommendations.*
