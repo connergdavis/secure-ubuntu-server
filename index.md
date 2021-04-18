@@ -39,9 +39,9 @@ The following suggestions might not work for you. If something goes wrong, pleas
 Create a `sudo` user so root account can be disabled.
 
   - 0.0 [SSH to root account](#00-ssh-to-root-account)
-  - 0.1 [Update Ubuntu packagers](#01-update-ubuntu-packages)
+  - 0.1 [Update Ubuntu](#01-update-ubuntu)
   - 0.2 [Create secure password](#02-create-secure-password)
-  - 0.3 [Create sudo user](#03-create-sudo-user)
+  - 0.3 [Create `sudo` user](#03-create-sudo-user)
   - 0.4 [Limit `su` command](#04-limit-su-command)
 
 ### Chapter 1: [Local SSH](#chapter-1-local-ssh-1)
@@ -50,31 +50,33 @@ Create SSH key login for local machine.
   - 1.0 [Generate SSH key](#10-generate-ssh-key)
   - 1.1 [Set safer permissions](#11-set-safer-permissions)
   - 1.2 [Create alias](#12-create-alias)
-  - 1.3 [Authorize local machine](#13-authorize-local-machine)
-  - 1.4 [Login with SSH key](#14-login-with-ssh-key)
+  - 1.3 [Copy public key](#13-copy-public-key)
+  - 1.4 [Authorize public key](#14-authorize-public-key)
+  - 1.5 [Login with SSH key](#15-login-with-ssh-key)
 
 ### Chapter 2: [SSH](#chapter-2-ssh-1)
 Tweak `sshd`'s configuration to provide much better security.
 
-  - 2.0 [Create SSH group](#20-create-ssh-group)
-  - 2.1 [Edit `/etc/ssh/sshd_config`](#21-edit-etcsshsshd_config)
-  - 2.2 [Check for errors in `sshd_config`](#22-check-for-errors-in-sshd_config)
-  - 2.3 [Only use long Diffie-Hellman moduli](#23-only-use-long-diffie-hellman-moduli)
+  - 2.0 [Disable root user](#20-disable-root-user)
+  - 2.1 [Create SSH group](#21-create-ssh-group)
+  - 2.2 [Secure `sshd`](#22-secure-sshd)
+  - 2.3 [Check for errors in `/etc/ssh/sshd_config`](#23-check-for-errors-in-etcsshd_config)
+  - 2.4 [Only use long Diffie-Hellman moduli](#24-only-use-long-diffie-hellman-moduli)
 
 ### Chapter 3: [Firewall](#chapter-3-firewall-1)
 Use `ufw` to block all traffic by default, then explicitly allow certain services.
 
-  - 3.0 [Block everything by default in `ufw`](#30-block-everything-by-default-in-ufw)
-  - 3.1 [Allow services out](#31-allow-services-out)
-  - 3.2 [Allow services in](#32-allow-services-in)
+  - 3.0 [Block everything by default](#30-block-everything-by-default)
+  - 3.1 [Allow services out: DNS, FTP, HTTP(S), NTP, `exim4`](#31-allow-services-out-dns-ftp-https-ntp-exim4)
+  - 3.2 [Allow services in: SSH](#32-allow-services-in-ssh)
   - 3.3 [Enable UFW](#33-enable-ufw)
 
 ### Chapter 4: [NTP](#chapter-4-ntp-1)
-Network Time Protocol uses global servers to update system time. Servers rely on accurate system time.
+Synchronizes system time with the internet via Network Time Protocol.
 
 *Note: NTP requires an open port specified in [Chapter 3: Firewall](#chapter-3-firewall).*
 
-  - 4.0 [Edit `/etc/ntp.conf`](#40-edit-etcntpconf)
+  - 4.0 [Edit NTP configuration](#40-edit-ntp-configuration)
   - 4.1 [Restart service](#41-restart-service)
 
 ### Chapter 5: [Email](#chapter-5-email-1)
@@ -84,18 +86,18 @@ Setup outgoing mail server to Gmail account. Chapters after this one offer or re
 
   - 5.0 [Install mail server (`exim4`)](#50-install-mail-server-exim4)
   - 5.1 [Configure `exim4`](#51-configure-exim4)
-  - 5.2 [Edit `/etc/exim4/passwd.client`](#52-edit-etcexim4passwdclient)
-  - 5.3 [Secure password file](#53-secure-password-file)
-  - 5.4 [Create login certificate](#54-create-login-certificate)
+  - 5.2 [Create Gmail login](#52-create-gmail-login)
+  - 5.3 [Protect Gmail login](#53-protect-gmail-login)
+  - 5.4 [Generate login certificate](#54-generate-login-certificate)
   - 5.5 [Login to Gmail](#55-login-to-gmail)
   - 5.6 [Edit `/etc/aliases`](#56-edit-etcaliases)
-  - 5.6 [Restart `exim4`](#57-restart-exim4)
-  - 5.7 [Send test email](#58-send-test-email)
+  - 5.7 [Restart `exim4`](#57-restart-exim4)
+  - 5.8 [Send test email](#58-send-test-email)
 
 ### Chapter 6: [File systems](#chapter-6-file-systems-1)
 Hide process ID file descriptors in `/proc`, and set stricter default file and folder permissions.
 
-  - 6.0 [Hide pids in `/proc`](#60-hide-pids-in-proc)
+  - 6.0 [Hide process files in `/proc`](#60-hide-process-files-in-proc)
   - 6.1 [Set default permissions](#61-set-default-permissions)
 
 ### Chapter 7: [Reports](#chapter-7-reports-1)
@@ -103,8 +105,8 @@ Run scans for viruses, monitor intrusions, and more. Email results in human-read
 
   - 7.0 [Daily reports about everything (`logwatch`)](#70-daily-reports-about-everything-logwatch)
   - 7.1 [Automatic updates (`unattended-upgrades`)](#71-automatic-updates-unattended-upgrades)
-    - 7.1.1 [Install `unattended-upgrades`](#711-install-unattended-upgrades)
-    - 7.1.2 [Edit `/etc/apt/apt.conf.d/51myunattended-upgrades`](#712-edit-etcaptaptconfd51myunattended-upgrades)
+    - 7.1.0 [Install `unattended-upgrades`](#710-install-unattended-upgrades)
+    - 7.1.1 [Edit `/etc/apt/apt.conf.d/51myunattended-upgrades`](#711-edit-etcaptaptconfd51myunattended-upgrades)
   - 7.2 [Antivirus (`clamav`)](#72-antivirus-clamav)
   - 7.3 [Rootkit detection (`rkhunter`, `chkrootkit`)](#73-rootkit-detection-rkhunter-chkrootkit)
     - 7.3.0 [Install packages](#730-install-packages)
@@ -403,7 +405,7 @@ sudo ufw default deny outgoing # Denies all outgoing traffic by default
 sudo ufw default deny incoming
 ```
 
-### 3.1 Allow services (NTP, HTTP(S), DNS, FTP, `exim4`) out
+### 3.1 Allow services out: DNS, FTP, HTTP(S), NTP, `exim4`
 The format of simple port rules is `allow/deny` `in/out` `port`. This can be more complex if restricting IPs, for example.
 
 ```bash
@@ -418,7 +420,7 @@ sudo ufw allow out ftp comment 'FTP'
 sudo ufw allow out whois comment 'WHOIS'
 ```
 
-### 3.2 Allow services (SSH) in
+### 3.2 Allow services in: SSH
 *Note: SSH connections are set to `limit` instead of `allow` to use UFW's built in rate-limiting to prevent attacks.*
 
 ```bash
@@ -434,7 +436,7 @@ sudo ufw status
 ```
 
 ## Chapter 4: NTP
-Network Time Protocol uses global servers to update system time. Servers rely on accurate system time.
+Synchronizes system time with the internet via Network Time Protocol.
 
 *Note: NTP requires an open port specified in [Chapter 3: Firewall](#chapter-3-firewall).*
 
@@ -563,7 +565,7 @@ sudo tail /var/log/exim4/mainlog # Read log results, especially if the test does
 ## Chapter 6: File systems
 Hide process ID file descriptors in `/proc`, and set stricter default file and folder permissions.
 
-### 6.0 Hide pids in `proc`
+### 6.0 Hide process files in `proc`
 Per [`man proc`](https://linux.die.net/man/5/proc), by default there is a readable file for every process running on the system inside `/proc/`, e.g., `/proc/1`.
 
 ```bash
@@ -727,13 +729,13 @@ TODO
 Isolate programs in their own virtual machine to limit access to real resources. The guide uses Firejail, but Docker is a great alternative.
 
 ### 9.0 Install `firejail`
-
+TODO
 
 ### 9.1 Run programs with `firejail`
-
+TODO
 
 ### 9.2 Create profiles for programs in `firejail`
-
+TODO
 
 ## Chapter 10: Audit
 Check the security of the server by running standardized audit software to report common weaknesses.
@@ -747,10 +749,13 @@ It's fun to set up a `firejail` for every process and receive daily reports abou
 There's all sorts of other things to do beyond the scope of this guide. It's just a starting point.
 
 ### 99.0 Disk encryption
-
+TODO
 
 ### 99.1 Separate partitions
-
+TODO
 
 ### 99.2 Good password policy
+TODO
 
+### 99.3 Process accounting
+TODO
