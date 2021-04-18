@@ -1,4 +1,4 @@
-v# Secure Ubuntu Server
+# Secure Ubuntu Server
 ## Disclaimer
 **I am not a security professional nor do I have any background in security.**
 
