@@ -126,7 +126,7 @@ Run scans for viruses, monitor intrusions, and more. Email results in human-read
     - 7.6.0 [Install `aide`](#761-install-aide)
     - 7.6.1 [Create initial database](#762-create-initial-database)
     - 7.6.2 [Configure daily checks](#763-configure-daily-checks)
-  - 7.7 [ARP monitoring (`arpwatch`)](#77-arp-monitoring-arpwatch) #TODO
+  - 7.7 [ARP monitoring (`arpwatch`)](#77-arp-monitoring-arpwatch)
 
 ### Chapter 8: [Kernel `sysctl`](#chapter-8-kernel-sysctl-1)
 Edit `/etc/sysctl.conf` kernel options to comply with stricter security standards.
@@ -146,7 +146,7 @@ Isolate programs in their own virtual machine to limit access to real resources.
 ### Chapter 10: [Audit](#chapter-10-audit-1)
 Check the security of the server by running standardized audit software to report common weaknesses.
 
-  - 10.0 [`lynis`](#110-lynis) #TODO
+  - 10.0 [`lynis`](#100-lynis)
 
 ### Chapter 98: [Keep local system safe](#chapter-98-keep-local-system-safe-1)
 It's fun to set up a `firejail` for every process and receive daily reports about file system integrity, but none of that matters if the local machine used to connect is breached. The SSH key and sudoer password are essential to the security of the system. Systems used to connect should ideally be just as safe as the server itself.
