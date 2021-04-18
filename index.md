@@ -36,7 +36,7 @@ The following suggestions might not work for you. If something goes wrong, pleas
 
 ## Table of Contents
 ### Chapter 0: [Beginning](#chapter-0-beginning-1)
-Update, create secure sudo user, and disable root access.
+Create a `sudo` user so root account can be disabled.
 
   - 0.0 [SSH to root account](#00-ssh-to-root-account)
   - 0.1 [Update Ubuntu packagers](#01-update-ubuntu-packages)
@@ -46,8 +46,6 @@ Update, create secure sudo user, and disable root access.
 
 ### Chapter 1: [Local SSH](#chapter-1-local-ssh-1)
 Create SSH key login for local machine.
-
-**Note**: `id_some`, `id_some.pub`, and `config` all belong on local machine. Server only needs `authorized_keys`.
 
   - 1.0 [Generate SSH key](#10-generate-ssh-key)
   - 1.1 [Set safer permissions](#11-set-safer-permissions)
@@ -64,7 +62,7 @@ Tweak `sshd`'s configuration to provide much better security.
   - 2.3 [Only use long Diffie-Hellman moduli](#23-only-use-long-diffie-hellman-moduli)
 
 ### Chapter 3: [Firewall](#chapter-3-firewall-1)
-Use `ufw` to switch to a block-by-default policy, selecting exactly what is allowed in and out.
+Use `ufw` to block all traffic by default, then explicitly allow certain services.
 
   - 3.0 [Block everything by default in `ufw`](#30-block-everything-by-default-in-ufw)
   - 3.1 [Allow services out](#31-allow-services-out)
@@ -74,7 +72,7 @@ Use `ufw` to switch to a block-by-default policy, selecting exactly what is allo
 ### Chapter 4: [NTP](#chapter-4-ntp-1)
 Network Time Protocol uses global servers to update system time. Servers rely on accurate system time.
 
-*Note: NTP requires a port to be open, which is specified in Chapter 3: Firewall.*
+*Note: NTP requires an open port specified in [Chapter 3: Firewall](#chapter-3-firewall).*
 
   - 4.0 [Edit `/etc/ntp.conf`](#40-edit-etcntpconf)
   - 4.1 [Restart service](#41-restart-service)
@@ -82,7 +80,7 @@ Network Time Protocol uses global servers to update system time. Servers rely on
 ### Chapter 5: [Email](#chapter-5-email-1)
 Setup outgoing mail server to Gmail account. Chapters after this one offer or require the ability to send mail.
 
-*Note: exim4 requires a port to be open, which is specified in Chapter 3: Firewall.*
+*Note: Email requires an open port specified in [Chapter 3: Firewall](#chapter-3-firewall).*
 
   - 5.0 [Install mail server (`exim4`)](#50-install-mail-server-exim4)
   - 5.1 [Configure `exim4`](#51-configure-exim4)
@@ -95,7 +93,7 @@ Setup outgoing mail server to Gmail account. Chapters after this one offer or re
   - 5.7 [Send test email](#58-send-test-email)
 
 ### Chapter 6: [File systems](#chapter-6-file-systems-1)
-Limit access to `/proc` and `/home` directories, and set default file and folder permissions.
+Hide process ID file descriptors in `/proc`, and set stricter default file and folder permissions.
 
   - 6.0 [Hide pids in `/proc`](#60-hide-pids-in-proc)
   - 6.1 [Set default permissions](#61-set-default-permissions)
@@ -154,14 +152,16 @@ There's all sorts of other things to do beyond the scope of this guide. It's jus
 <hr />
 
 ## Chapter 0: Beginning
+Create a `sudo` user so root account can be disabled.
+
 ### **Objectives**
 &#9745; **Update Ubuntu**<br>
-&#9745; **Create `sudo` user**, a normal user who can execute root commands individually with password verification<br>
-&#9745; **Limit `su` command**, so only admin account can use it
+&#9745; **Create `sudo` user**<br>
+&#9745; **Limit `su` command**
 
 ### **Why...**
-**Create `sudo` user**? Using root account means all programs are run by root account. Root lets a program do *anything*, but most programs need very little access. `sudo` can be used before a command to run that command as root,  eliminating the need to login as root.<br>
-**Limit `su` command**? `su` allows users to switch to other accounts including root.
+**Create `sudo` user**? Using root account means all programs are run by root account. Root lets a program do *anything*, but most programs need very little access. `sudo` can be used before a command to run that command as root,  eliminating the need to login as root at all.<br>
+**Limit `su` command**? `su` allows users to switch to other accounts, including root. That's a powerful privilege.
 
 ### 0.0 SSH to root account
 ```bash
@@ -175,13 +175,13 @@ apt upgrade
 ```
 
 ### 0.2 Create secure password
-Use a password manager to generate a long, unpredictable password for the new `sudo` account.
+Use a password manager to generate a long, unpredictable password for the new `sudo` user.
 
 ### 0.3 Create `sudo` user
-By default, `/etc/ssh/sshd_config` gives members of group `sudo` full permissions: `%sudo	ALL=(ALL:ALL) ALL`.
-
+*Note: By default, `/etc/ssh/sshd_config` gives members of group `sudo` full permissions (`%sudo	ALL=(ALL:ALL) ALL`)*
 ```bash
 NEWUSER=`admin` # Username
+# By default, `/etc/ssh/sshd_config` gives members of group `sudo` full permissions (`%sudo	ALL=(ALL:ALL) ALL`)
 addgroup sudo # Create group for sudoers
 adduser $NEWUSER # Create new user
 usermod -a -G sudo $NEWUSER # Add user to sudoers group
@@ -191,7 +191,6 @@ su - $NEWUSER # Login to new account
 
 ### 0.4 Limit `su` command
 With a `sudo` user now in place, limit use of `su` to just them.
-
 ```bash
 sudo addgroup suers
 sudo usermod -a -G suers $USER
@@ -199,21 +198,21 @@ sudo dpkg-statoverride --update --add root suers 4750 /bin/su # Now `su` can onl
 ```
 
 ## Chapter 1: Local SSH
+Create SSH key login for local machine.
+
 ### **Objectives**
-&#9745; **Generate SSH key** to connect securely to server without password exchange<br>
-&#9745; **Authorize local machine**<br>
+&#9745; **Generate SSH key**<br>
+&#9745; **Authorize public key**<br>
 &#9745; **Login with SSH key**
 
 ### **Why...**
-**Login with SSH key**? SSH keys are 256 bits, longer than most passwords, and do not need to be sent to the server like a password. Note that SSH keys are stored in `~/.ssh/`: the security of these files on local machine is essential.
+**Login with SSH key**? SSH keys are 256 bits, longer than most passwords, and do not need to be sent to the server like a password. **However, anyone who can read the private key file can login.** Secure these files, and the machine(s) storing them!
 
-**Note**: `id_some`, `id_some.pub`, and `config` all belong on local machine. Server only needs `authorized_keys`.
+*Note: `id_some`, `id_some.pub`, and `config` all belong on local machine. Server only needs `authorized_keys`.*
 
 ### 1.0 Generate SSH key
-Take a second to create a Gmail account for the server, rather than using a personal email. **This guide relies on Gmail to send mail**, but it will work on Yahoo, etc. with extra changes.
-
-*Note: When prompted, "Enter a file in which to save the key", provide path: `/home/$USER/.ssh/id_some` where `some` is anything.*
-
+Use a custom Gmail account for the server instead of a personal address. **This guide relies on Gmail to send mail**, but everything will work just as well on Yahoo, for example, with some extra work not covered here.<br>
+*Note: When prompted, "Enter a file in which to save the key", provide path: `/home/$USER/.ssh/id_some` where `some` is something memorable*
 ```bash
 # When prompted, "Enter a file in which to save the key", provide path: `/home/$USER/.ssh/id_some` where `some` is something memorable
 ssh-keygen -t ed25519 -C "myserver@gmail.com" # Generate SSH keypair
@@ -223,8 +222,7 @@ ssh-add ~/.ssh/id_some # Register new keypair with sshd
 ### 1.1 Set safer permissions
 In Linux, every file has rules for what the (1) user and (2) group who owns the file can do, and what (3) everyone else can do. These comprise the three consecutive numbers in `chmod` commands. For example, `700` gives full access to (1) the owner but no access to (2) the owner's groups or (3) other users - `0` denotes no access, `7` full access.
 
-SSH uses public key cryptography for "SSH keys". This is a huge topic, but the meat is that private key must be protected at all costs, while public key is innocuous.
-
+SSH uses public key cryptography for "SSH keys". **TL;DR**: private key must be protected at all costs, public key is innocuous.
 ```bash
 chmod 644 ~/.ssh/id_some.pub # Limit public key access - someone else reading this is not dangerous
 chmod 600 ~/.ssh/id_some # Lock down private key - this is dangerous
@@ -250,15 +248,13 @@ Host myalias
 ```
 
 ### 1.3 Copy public key
-**Note**: Ensure trailing whitespace is not included in copy-paste.
-
+Ensure trailing whitespace is not included in copy-paste.
 ```bash
 cat ~/.ssh/id_some.pub
 ```
 
-### 1.4 Authorize local machine
-**Note**: Return to server SSH shell for this step.
-
+### 1.4 Authorize public key
+Return to server SSH shell for this step.
 ```bash
 touch ~/.ssh/authorized_keys
 chmod 600 ~/.ssh/authorized_keys
@@ -266,27 +262,29 @@ echo "(public key from clipboard)" > ~/.ssh/authorized_keys
 ```
 
 ### 1.5 Login with SSH key
-**Note**: Close existing SSH to `root` upon success.
-
+Close existing SSH to `root` upon success.
 ```bash
 ssh some
 ```
 
 ## Chapter 2: SSH
+Tweak `sshd`'s configuration to provide much better security.
+
 ### **Objectives**
-&#9745; **Disable root user** to prevent root login since sudo user can do everything<br>
-&#9745; **Secure `sshd`** to mitigate attacks on SSH, which is always exposed
+&#9745; **Disable root user**<br>
+&#9745; **Secure `sshd`**
 
 ### **Why...**
-**Login with SSH key**? SSH keys are 256 bits, longer than most passwords, and do not need to be sent to the server like a password. Note that SSH keys are stored in `~/.ssh/`: the security of these files on local machine is essential.
+**Disable root user**? SSH keys are 256 bits, longer than most passwords, and do not need to be sent to the server like a password. Note that SSH keys are stored in `~/.ssh/`: the security of these files on local machine is essential.<br>
+**Secure `sshd`**? SSH port must be open to public all the time, and home network IP changes dynamically, so whitelists are not an option for the average person.
 
 ### 2.0 Disable root user
-Now that a sudo user exists and can login with SSH, there's no need for the root user.
+With a `sudo` user, any command that needs root access can be run without the root account itself. Thus, root account can be safely disabled.
 
-*Note: Technically, this just makes it impossible to login to root shell. It is possible to fully "disable" root.*
+*Note: Technically, this just makes it impossible to login to root shell.*
 
 ```bash
-sudo usermod -s /bin/false root
+sudo usermod -s /bin/false root # Technically, this just makes it impossible to login to root shell
 ```
 
 ### 2.1 Create SSH group
@@ -298,13 +296,13 @@ sudo usermod -a -G sshers $USER
 ```
 
 ### 2.2 Secure `sshd`
-The SSH configuration file.
+Secure `sshd` by editing its configuration file. There are two sections: suggestions by the guide, and suggestions by Mozilla InfoSec.
 
-*Note: See https://infosec.mozilla.org/guidelines/openssh#modern-openssh-67 for latest recommendations.*
-
-*Also note: Duplicate entries in `/etc/ssh/sshd_config` will fail or cause an error. Check existing entries before copying.*
-
+*Note: See https://infosec.mozilla.org/guidelines/openssh#modern-openssh-67 for latest recommendations.*<br>
+*Also note: Duplicate entries in `/etc/ssh/sshd_config` will fail or cause an error. Check existing entries before copying.*<br>
 *Also note: If setting `Port #`, closed firewalls will block this port until it is opened. Default SSH port is generally already open. This guide illustrates how to open the port, but closing connection prior might lock the keys forever.*
+
+Edit `/etc/ssh/sshd_config`:
 
 ```bash
 # ++++ The following are recommendations by the guide
@@ -374,34 +372,41 @@ UsePrivilegeSeparation sandbox
 ```
 
 ### 2.3 Check for errors in `sshd_config`
-Errors will be returned if there are any. Otherwise, successful output will list every entry and value, e.g. `permitrootlogin no`.
+Errors will be returned if there are any. Successful output will list every entry and value found in `sshd_config`, e.g. `permitrootlogin no`.
 
 ```bash
-# Successful output will list every entry and value, e.g. `permitrootlogin no`
 sudo sshd -T
 ```
 
 ### 2.4 Only use long Diffie-Hellman moduli
+An additional requirement of Firefox InfoSec guidelines on OpenSSH.
+
 *Note: See https://infosec.mozilla.org/guidelines/openssh#intermediate-openssh-53 for latest recommendations.*
 
 ```bash
-sudo awk '$5 >= 3071' /etc/ssh/moduli | sudo tee /etc/ssh/moduli.tmp
+sudo awk '$5 >= 3071' /etc/ssh/moduli | sudo tee /etc/ssh/moduli.tmp # Strip moduli < 3072 bits long
 sudo mv /etc/ssh/moduli.tmp /etc/ssh/moduli
 ```
 
-Optionally, consider also meeting [Mozilla recommendations for SSH *client* on local machine](https://infosec.mozilla.org/guidelines/openssh#configuration-1).
-
 ## Chapter 3: Firewall
-Use ufw to switch to a block-by-default policy, selecting exactly what is allowed in and out.
+Use `ufw` to block all traffic by default, then explicitly allow certain services.
 
-### 3.0 Block everything by default in `ufw`
+### **Objectives**
+&#9745; **Block everything by default**<br>
+&#9745; **Allow services (NTP, HTTP(S), DNS, FTP, `exim4`) out**<br>
+&#9745; **Allow services (SSH) in**
+
+### **Why...**
+**Block everything by default?** Explicit control over traffic in and out of the server. Being "online" is a substantial security threat.
+
+### 3.0 Block everything by default
 ```bash
 sudo apt install ufw
-sudo ufw default deny outgoing
+sudo ufw default deny outgoing # Denies all outgoing traffic by default
 sudo ufw default deny incoming
 ```
 
-### 3.1 Allow services out
+### 3.1 Allow services (NTP, HTTP(S), DNS, FTP, `exim4`) out
 The format of simple port rules is `allow/deny` `in/out` `port`. This can be more complex if restricting IPs, for example.
 
 ```bash
@@ -416,7 +421,7 @@ sudo ufw allow out ftp comment 'FTP'
 sudo ufw allow out whois comment 'WHOIS'
 ```
 
-### 3.2 Allow services in
+### 3.2 Allow services (SSH) in
 *Note: SSH connections are set to `limit` instead of `allow` to use UFW's built in rate-limiting to prevent attacks.*
 
 ```bash
@@ -434,14 +439,12 @@ sudo ufw status
 ## Chapter 4: NTP
 Network Time Protocol uses global servers to update system time. Servers rely on accurate system time.
 
-*Note: NTP requires a port to be open, which is specified in Chapter 3: Firewall.*
+*Note: NTP requires an open port specified in [Chapter 3: Firewall](#chapter-3-firewall).*
 
-### 4.0 Edit `/etc/ntp.conf`
-Optionally, make the changes by commenting out lines beginning with `server` or `pool`, and add `pool pool.ntp.org iburst` to the end on a new line.
-
+### 4.0 Edit NTP configuration
 ```bash
-sudo sed -i -r -e "s/^((server|pool).*)/# \1         # $(whoami) did this on $(date +"%Y-%m-%d %H:%M:%S")" /etc/ntp.conf
-echo -e "\npool pool.ntp.org iburst         # $(whoami) did this on $(date +"%Y-%m-%d %H:%M:%S")" /etc/ntp.conf | sudo tee -a /etc/ntp.conf
+sudo sed -i -r -e "s/^((server|pool).*)/# \1" /etc/ntp.conf
+echo -e "\npool pool.ntp.org iburst" /etc/ntp.conf | sudo tee -a /etc/ntp.conf
 ```
 
 ### 4.1 Restart service
@@ -456,7 +459,14 @@ sudo ntpq -p # Prints NTP peer status
 ## Chapter 5: Email
 Setup outgoing mail server to Gmail account. Chapters after this one offer or require the ability to send mail.
 
-*Note: exim4 requires a port to be open, which is specified in Chapter 3: Firewall.*
+*Note: Email requires an open port specified in [Chapter 3: Firewall](#chapter-3-firewall).*
+
+### **Objectives**
+&#9745; **Install mail server**<br>
+&#9745; **Login to Gmail**
+
+### **Why...**
+**Login to Gmail?** Gmail is easy and free to set up. Also eliminates the need to run a full mail server.
 
 ### 5.0 Install mail server (`exim4`)
 `openssl` and `ca-certificates` are also needed to log into Gmail servers.
@@ -476,26 +486,31 @@ When prompted, continue with the default setting for all but the following optio
 | **IP-address or host name of the outgoing smarthost** | `smtp.gmail.com::465` |
 
 ```bash
-sudo dpkg-reconfigure exim4-config
+sudo dpkg-reconfigure exim4-config # Visual config instead of a file; navigate with arrow keys, Enter to go forward, Esc to go back
 ```
 
-### 5.2 Edit `/etc/exim4/passwd.client`
-Provide login credentials so `exim4` can send email from your account to itself.
+### 5.2 Create Gmail login
+Provide login credentials so `exim4` can send email on your behalf.
+
+Edit `/etc/exim4/passwd.client`:
 
 ```bash
 smtp.gmail.com:address@gmail.com:password
 *.google.com:address@gmail.com:password
 ```
 
-### 5.3 Secure password file
-`Debian-exim` is the default group used by `exim4` to send mail.
+### 5.3 Protect Gmail login
+
+Lock the new password file down.
+
+*Note: `Debian-exim` is the default group used by `exim4` to send mail*
 
 ```bash
-sudo chown root:Debian-exim /etc/exim4/passwd.client
+sudo chown root:Debian-exim /etc/exim4/passwd.client # `Debian-exim` is the default group used by `exim4` to send mail
 sudo chmod 640 /etc/exim4/passwd.client
 ```
 
-### 5.4 Create login certificate
+### 5.4 Generate login certificate
 Create a TLS certificate `exim4` can use to login to Gmail servers.
 
 When prompted, provide the following specific answers:
@@ -506,34 +521,39 @@ When prompted, provide the following specific answers:
 | Email Address | `email@gmail.com` |
 
 ```bash
-sudo bash /usr/share/doc/exim4-base/examples/exim-gencert
+sudo bash /usr/share/doc/exim4-base/examples/exim-gencert # exim4 provides a script to do this automatically
 ```
 
 ### 5.5 Login to Gmail
 Finally, configure `exim4` to connect to Gmail servers using your account.
 
-```bash
-cat << EOF | sudo tee /etc/exim4/exim4.conf.localmacros
+Edit `/etc/exim4/exim4.conf.localmacros`:
+
+```
 MAIN_TLS_ENABLE = 1
 REMOTE_SMTP_SMARTHOST_HOSTS_REQUIRE_TLS = *
 TLS_ON_CONNECT_PORTS = 465
 REQUIRE_PROTOCOL = smtps
 IGNORE_SMTP_LINE_LENGTH_LIMIT = true
-EOF
+```
+
+Now slightly reconfigure `exim4` to use TLS.
+
+```bash
 sudo sed -i -r -e '/^.ifdef REMOTE_SMTP_SMARTHOST_HOSTS_REQUIRE_TLS$/I { :a; n; /^.endif$/!ba; a\n .ifdef REQUIRE_PROTOCOL\nprotocol = REQUIRE_PROTOCOL\n .endif\n' -e '}' /etc/exim4/exim4.conf.template
 sudo sed -i -r -e "/\.ifdef MAIN_TLS_ENABLE/ a\n .ifdef TLS_ON_CONNECT_PORTS\n tls_on_connect_ports = TLS_ON_CONNECT_PORTS\n.endif\n" /etc/exim4/exim4.conf.template
 ```
 
 ### 5.6 Edit `/etc/aliases`
-To avoid copying the email address to every application that will send mail, overwrite the `root` mail alias. It's just good practice in case this address needs to change.
+To avoid copying the email address to every application that will send mail, overwrite the `root` mail alias. That's a lot easier than copying the email address for each program that sends mail.
 
-```bash
+```
 root: address@gmail.com
 ```
 
 ### 5.7 Restart `exim4`
 ```bash
-sudo update-exim4.conf
+sudo update-exim4.conf # Will output config errors, if there are any
 sudo service exim4 restart
 ```
 
@@ -544,7 +564,7 @@ sudo tail /var/log/exim4/mainlog # Read log results, especially if the test does
 ```
 
 ## Chapter 6: File systems
-Limit access to `/proc` and `/home` directories, and set default file and folder permissions.
+Hide process ID file descriptors in `/proc`, and set stricter default file and folder permissions.
 
 ### 6.0 Hide pids in `proc`
 Per [`man proc`](https://linux.die.net/man/5/proc), by default there is a readable file for every process running on the system inside `/proc/`, e.g., `/proc/1`.
@@ -662,15 +682,15 @@ sudo dpkg-reconfigure rkhunter
 ```
 
 #### 7.3.2 Edit `/etc/rkhunter.conf`
-```
+```bash
 UPDATE_MIRRORS=1
-MIRRORS_MODE=0
-MAIL-ON-WARNING=root
-COPY_LOG_ON_ERROR=1
-PKGMGR=NONE
-PHALANX_DIRTEST=1
-WEB_CMD=""
-USE_LOCKING=1
+MIRRORS_MODE=0 # Use mirrors from the internet
+MAIL-ON-WARNING=root # Send mail to `root` alias
+COPY_LOG_ON_ERROR=1 # Copy error logs to file
+PKGMGR=NONE # Suggested value for Debian by docs
+PHALANX_DIRTEST=1 # Suggested by docs
+WEB_CMD="" # Suggested value for Debian by docs
+USE_LOCKING=1 # Prevents more than one `rkhunter` from running at once
 SHOW_SUMMARY_WARNINGS_NUMBER=1
 ```
 
