@@ -123,17 +123,14 @@ Edit `/etc/sysctl.conf` kernel options to comply with stricter security standard
   - 8.1 [Test new settings](#81-test-new-settings) #TODO
   - 8.2 [Restart server](#82-restart-server) #TODO
 
-### Chapter 9: [Services](#chapter-9-services-1)
-TODO
-
-### Chapter 10: [Sandboxes](#chapter-10-sandboxes-1)
+### Chapter 9: [Sandboxes](#chapter-9-sandboxes-1)
 Isolate programs in their own virtual machine to limit access to real resources. The guide uses Firejail, but Docker is a great alternative.
 
   - 10.0 [Install `firejail`](#100-install-firejail) #TODO
   - 10.1 [Run programs with `firejail`](#101-run-programs-with-firejail) #TODO
   - 10.2 [Create profiles for programs in `firejail`](#102-create-profiles-for-programs-in-firejail) #TODO
 
-### Chapter 11: [Audit](#chapter-11-audit-1)
+### Chapter 10: [Audit](#chapter-10-audit-1)
 Check the security of the server by running standardized audit software to report common weaknesses.
 
   - 11.0 [`lynis`](#110-lynis) #TODO
@@ -726,25 +723,22 @@ TODO
 ### 8.2 Restart server
 TODO
 
-## Chapter 9: Services
-TODO
-
-## Chapter 10: Sandboxes
+## Chapter 9: Sandboxes
 Isolate programs in their own virtual machine to limit access to real resources. The guide uses Firejail, but Docker is a great alternative.
 
-### 10.0 Install `firejail`
+### 9.0 Install `firejail`
 
 
-### 10.1 Run programs with `firejail`
+### 9.1 Run programs with `firejail`
 
 
-### 10.2 Create profiles for programs in `firejail`
+### 9.2 Create profiles for programs in `firejail`
 
 
-## Chapter 11: Audit
+## Chapter 10: Audit
 Check the security of the server by running standardized audit software to report common weaknesses.
 
-### 11.0 `lynis`
+### 10.0 `lynis`
 
 ## Chapter 98: Keep local system safe
 It's fun to set up a `firejail` for every process and receive daily reports about file system integrity, but none of that matters if the local machine used to connect is breached. The SSH key and sudoer password are essential to the security of the system. Systems used to connect should ideally be just as safe as the server itself.
