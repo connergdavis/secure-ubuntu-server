@@ -116,7 +116,12 @@ Run scans for viruses, monitor intrusions, and more. Email results in human-read
   - 7.4 [Host intrusion detection (`ossec`)](#74-host-intrusion-detection-ossec)
     - 7.4.0 [Prepare to build from source](#740-prepare-to-build-from-source)
     - 7.4.1 [Install `ossec`](#741-install-ossec)
-  - 7.5 [App intrusion detection (`fail2ban`)](#75-app-intrusion-detection-fail2ban) #TODO
+  - 7.5 [App intrusion detection (`fail2ban`)](#75-app-intrusion-detection-fail2ban)
+    - 7.5.0 [Install `fail2ban`](#750-install-fail2ban)
+    - 7.5.1 [Edit global config](#751-edit-global-config)
+    - 7.5.2 [Create jails](#752-create-jails)
+    - 7.5.3 [Enable `fail2ban`](#753-enable-fail2ban)
+    - 7.5.4 [Check jail statuses](#754-check-jail-statuses)
   - 7.6 [File system integrity monitoring (`aide`)](#76-file-system-integrity-monitoring-aide) #TODO
   - 7.7 [ARP monitoring (`arpwatch`)](#77-arp-monitoring-arpwatch) #TODO
 
@@ -727,7 +732,53 @@ sudo ./install.sh
 ```
 
 ### 7.5 App intrusion detection (`fail2ban`)
-TODO
+#### 7.5.0 Install `fail2ban`
+```bash
+sudo apt install fail2ban
+```
+
+#### 7.5.1 Edit `/etc/fail2ban/jail.local`
+```bash
+[DEFAULT]
+# Ignore self
+ignoreip = 127.0.0.1/8 [LAN SEGMENT]
+
+# Send email
+destemail = account@gmail.com
+sender = account@gmail.com
+
+# exim4 to send mail
+mta = mail
+
+# Get email alerts
+action = %(action_mwl)s
+```
+
+#### 7.5.2 Create jails
+Jails can be created for any program, and presets exist for many, but the easy, obvious example is SSH.
+
+Create an SSH jail like so:
+```bash
+[sshd]
+enabled = true
+banaction = ufw
+port = 54321 # custom SSH port here
+filter = sshd
+logpath = %(sshd_log)s
+maxretry = 5
+```
+
+#### 7.5.3 Enable `fail2ban`
+```bash
+sudo fail2ban-client start
+sudo fail2ban-client reload
+sudo fail2ban-client add sshd
+```
+
+#### 7.5.4 Check jail statuses
+```bash
+sudo fail2ban-client status
+```
 
 ### 7.6 File system integrity monitoring (`aide`)
 TODO
