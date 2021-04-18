@@ -122,7 +122,10 @@ Run scans for viruses, monitor intrusions, and more. Email results in human-read
     - 7.5.2 [Create jails](#752-create-jails)
     - 7.5.3 [Enable `fail2ban`](#753-enable-fail2ban)
     - 7.5.4 [Check jail statuses](#754-check-jail-statuses)
-  - 7.6 [File system integrity monitoring (`aide`)](#76-file-system-integrity-monitoring-aide) #TODO
+  - 7.6 [File system integrity monitoring (`aide`)](#76-file-system-integrity-monitoring-aide)
+    - 7.6.0 [Install `aide`](#761-install-aide)
+    - 7.6.1 [Create initial database](#762-create-initial-database)
+    - 7.6.2 [Configure daily checks](#763-configure-daily-checks)
   - 7.7 [ARP monitoring (`arpwatch`)](#77-arp-monitoring-arpwatch) #TODO
 
 ### Chapter 8: [Kernel `sysctl`](#chapter-8-kernel-sysctl-1)
@@ -757,7 +760,7 @@ action = %(action_mwl)s
 #### 7.5.2 Create jails
 Jails can be created for any program, and presets exist for many, but the easy, obvious example is SSH.
 
-Create an SSH jail like so:
+Create an SSH jail at `/etc/fail2ban/jail.d/ssh.local`:
 ```bash
 [sshd]
 enabled = true
@@ -781,7 +784,29 @@ sudo fail2ban-client status
 ```
 
 ### 7.6 File system integrity monitoring (`aide`)
-TODO
+Monitors files and notifies when changes are detected.
+
+#### 7.6.0 Install `aide`
+```bash
+sudo apt install aide
+```
+
+#### 7.6.1 Create initial database
+```bash
+sudo aideinit
+```
+
+#### 7.6.2 Configure daily checks
+Edit `/etc/default/aide`:
+```bash
+CRON_DAILY_RUN=yes
+```
+
+#### 7.6.3 Maintain
+Each time a known change is made to a file inside AIDE's scope, update the database with:
+```bash
+sudo aideinit -y -f
+```
 
 ### 7.7 ARP monitoring (`arpwatch`)
 TODO
