@@ -72,7 +72,7 @@ Use `ufw` to block all traffic by default, then explicitly allow certain service
   - 3.3 [Enable UFW](#33-enable-ufw)
 
 ### Chapter 4: [NTP](#chapter-4-ntp-1)
-Synchronizes system time with the internet via Network Time Protocol.
+Synchronize system time with the internet via Network Time Protocol.
 
 *Note: NTP requires an open port specified in [Chapter 3: Firewall](#chapter-3-firewall).*
 
@@ -80,7 +80,7 @@ Synchronizes system time with the internet via Network Time Protocol.
   - 4.1 [Restart service](#41-restart-service)
 
 ### Chapter 5: [Email](#chapter-5-email-1)
-Setup outgoing mail server to Gmail account. Chapters after this one offer or require the ability to send mail.
+Allow the server to send email logs securely to Gmail.
 
 *Note: Email requires an open port specified in [Chapter 3: Firewall](#chapter-3-firewall).*
 
@@ -113,7 +113,9 @@ Run scans for viruses, monitor intrusions, and more. Email results in human-read
     - 7.3.1 [Enable cron scripts](#731-enable-cron-scripts)
     - 7.3.2 [Edit `/etc/rkhunter.conf`](#732-edit-etcrkhunterconf)
     - 7.3.3 [Update `rkhunter`](#733-update-rkhunter)
-  - 7.4 [Host intrusion detection (`ossec`)](#74-host-intrusion-detection-ossec) #TODO
+  - 7.4 [Host intrusion detection (`ossec`)](#74-host-intrusion-detection-ossec)
+    - 7.4.0 [Prepare to build from source](#740-prepare-to-build-from-source)
+    - 7.4.1 [Install `ossec`](#741-install-ossec)
   - 7.5 [App intrusion detection (`fail2ban`)](#75-app-intrusion-detection-fail2ban) #TODO
   - 7.6 [File system integrity monitoring (`aide`)](#76-file-system-integrity-monitoring-aide) #TODO
   - 7.7 [ARP monitoring (`arpwatch`)](#77-arp-monitoring-arpwatch) #TODO
@@ -128,14 +130,14 @@ Edit `/etc/sysctl.conf` kernel options to comply with stricter security standard
 ### Chapter 9: [Sandboxes](#chapter-9-sandboxes-1)
 Isolate programs in their own virtual machine to limit access to real resources. The guide uses Firejail, but Docker is a great alternative.
 
-  - 10.0 [Install `firejail`](#100-install-firejail) #TODO
-  - 10.1 [Run programs with `firejail`](#101-run-programs-with-firejail) #TODO
-  - 10.2 [Create profiles for programs in `firejail`](#102-create-profiles-for-programs-in-firejail) #TODO
+  - 9.0 [Install `firejail`](#100-install-firejail) #TODO
+  - 9.1 [Run programs with `firejail`](#101-run-programs-with-firejail) #TODO
+  - 9.2 [Create profiles for programs in `firejail`](#102-create-profiles-for-programs-in-firejail) #TODO
 
 ### Chapter 10: [Audit](#chapter-10-audit-1)
 Check the security of the server by running standardized audit software to report common weaknesses.
 
-  - 11.0 [`lynis`](#110-lynis) #TODO
+  - 10.0 [`lynis`](#110-lynis) #TODO
 
 ### Chapter 98: [Keep local system safe](#chapter-98-keep-local-system-safe-1)
 It's fun to set up a `firejail` for every process and receive daily reports about file system integrity, but none of that matters if the local machine used to connect is breached. The SSH key and sudoer password are essential to the security of the system. Systems used to connect should ideally be just as safe as the server itself.
@@ -436,7 +438,7 @@ sudo ufw status
 ```
 
 ## Chapter 4: NTP
-Synchronizes system time with the internet via Network Time Protocol.
+Synchronize system time with the internet via Network Time Protocol.
 
 *Note: NTP requires an open port specified in [Chapter 3: Firewall](#chapter-3-firewall).*
 
@@ -456,7 +458,7 @@ sudo ntpq -p # Prints NTP peer status
 ```
 
 ## Chapter 5: Email
-Setup outgoing mail server to Gmail account. Chapters after this one offer or require the ability to send mail.
+Allow the server to send email logs securely to Gmail.
 
 *Note: Email requires an open port specified in [Chapter 3: Firewall](#chapter-3-firewall).*
 
@@ -702,7 +704,27 @@ sudo rkhunter --propupd
 ```
 
 ### 7.4 Host intrusion detection (`ossec`)
-TODO
+By default, `ossec` runs a rootkit check every two hours.
+
+#### 7.4.0 Prepare to build from source
+```bash
+sudo apt install libevent-dev libz-dev libssl-dev libpcre2-dev build-essential
+```
+
+#### 7.4.1 Install `ossec`
+When prompted by `install.sh`, provide the following specific answers:
+
+| ? | _ |
+| -- | -- |
+| What kind of installation do you want? | `local` |
+| What's your e-mail address? | `address@gmail.com` |
+
+```bash
+wget https://github.com/ossec/ossec-hids/archive/3.6.0.tar.gz # Be sure to check https://github.com/ossec/ossec-hids for version
+tar xzf 3.6.0.tar.gz # Extracts zip to folder
+cd ossec-hids-3.6.0/
+sudo ./install.sh
+```
 
 ### 7.5 App intrusion detection (`fail2ban`)
 TODO
