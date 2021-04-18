@@ -138,9 +138,10 @@ Edit `/etc/sysctl.conf` kernel options to comply with stricter security standard
 ### Chapter 9: [Sandboxes](#chapter-9-sandboxes-1)
 Isolate programs in their own virtual machine to limit access to real resources. The guide uses Firejail, but Docker is a great alternative.
 
-  - 9.0 [Install `firejail`](#100-install-firejail) #TODO
-  - 9.1 [Run programs with `firejail`](#101-run-programs-with-firejail) #TODO
-  - 9.2 [Create profiles for programs in `firejail`](#102-create-profiles-for-programs-in-firejail) #TODO
+  - 9.0 [Install `firejail`](#90-install-firejail)
+  - 9.1 [Run programs with `firejail`](#91-run-programs-with-firejail)
+  - 9.2 [Create profiles for programs in `firejail`](#92-create-profiles-for-programs-in-firejail) 
+  - 9.3 [Run programs with `firejail` and jail options](#93-run-programs-with-firejail-and-jail-options)
 
 ### Chapter 10: [Audit](#chapter-10-audit-1)
 Check the security of the server by running standardized audit software to report common weaknesses.
@@ -809,7 +810,10 @@ sudo aideinit -y -f
 ```
 
 ### 7.7 ARP monitoring (`arpwatch`)
-TODO
+```bash
+sudo apt install arpwatch
+sudo service arpwatch start
+```
 
 ## Chapter 8: Kernel `sysctl`
 Edit `/etc/sysctl.conf` kernel options to comply with stricter security standards.
@@ -827,18 +831,40 @@ TODO
 Isolate programs in their own virtual machine to limit access to real resources. The guide uses Firejail, but Docker is a great alternative.
 
 ### 9.0 Install `firejail`
-TODO
+```bash
+sudo apt install firejail firejail-profiles
+```
 
 ### 9.1 Run programs with `firejail`
-TODO
+There are two ways to run programs inside a `firejail`. Programs that work fine on the default profile, or which have a built-in profile, can generally be jailed simply by doing:
+
+```bash
+sudo ln -s /usr/bin/firejail /usr/local/bin/some-program # Where some-program is currently at /usr/bin/ or /bin
+```
+
+Now the program will always execute inside a jail.
 
 ### 9.2 Create profiles for programs in `firejail`
-TODO
+Some programs do not comply with the default profile and need a custom profile with more refined editing.
+
+Create a custom profile at `/etc/firejail/some-program.profile`. Browse the existing profiles in `/etc/firejail` to get an idea of the syntax and available options.
+
+See [Building Custom Profiles | Firejail](https://firejail.wordpress.com/documentation-2/building-custom-profiles/) for the full list of options available here.
+
+### 9.3 Run programs with `firejail` and jail options
+It is also possible to launch an application with the `firejail` command including the jail options, like:
+```bash
+firejail --noprofile --disable-mnt --no3d ... -- my-program ...
+```
 
 ## Chapter 10: Audit
 Check the security of the server by running standardized audit software to report common weaknesses.
 
 ### 10.0 `lynis`
+```
+sudo apt install lynis
+sudo lynis audit system
+```
 
 ## Chapter 98: Keep local system safe
 It's fun to set up a `firejail` for every process and receive daily reports about file system integrity, but none of that matters if the local machine used to connect is breached. The SSH key and sudoer password are essential to the security of the system. Systems used to connect should ideally be just as safe as the server itself.
