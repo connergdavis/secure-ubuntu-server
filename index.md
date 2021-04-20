@@ -1,36 +1,46 @@
-# Secure Ubuntu Server
-## Disclaimer
-**I am not a security professional nor do I have any background in security.**
-
-I am a software engineer who wants to run personal servers secure enough for the real world.
-
-I am not a master or even remotely experienced in the following topics. I gathered knowledge from free online sources and researched what things mean enough for my own understanding.
-
-The following suggestions might not work for you. If something goes wrong, please let us know via [Issues](https://github.com/connergdavis/secure-ubuntu-server/issues)!
-
+# "Secure" Ubuntu Server
+## <strong>Please read [README.md](https://github.com/connergdavis/secure-ubuntu-server/blob/master/index.md) before proceeding.</strong>
 ## References
+### Security Benchmarks
+- [CIS Ubuntu 20.04 (cisecurity.org)](https://learn.cisecurity.org/l/799323/2021-04-01/41hcb)
 
-### General Security Guides
+### Security Guides
+- [Guide to the Secure Configuration of Red Hat Enterprise Linux 5 (nsa.gov)](https://apps.nsa.gov/iaarchive/customcf/openAttachment.cfm?FilePath=/iad/library/ia-guidance/security-configuration/operating-systems/assets/public/upload/Guide-to-the-Secure-Configuration-of-Red-Hat-Enterprise-Linux-5.pdf&WpKes=aF6woL7fQp3dJiJBWAw3WMetdZYXycAJW5SRcb)
+- [imthenachoman/How-To-Secure-A-Linux-Server (github.com)](https://github.com/imthenachoman/How-To-Secure-A-Linux-Server)
+- [Linux workstation security checklist (github.com)](https://github.com/lfit/itpol/blob/master/linux-workstation-security.md)
+- [Securing Debian Manual (debian.org)](https://www.debian.org/doc/manuals/securing-debian-manual/index.en.html)
+- [Security - Arch Linux Wiki (archlinux.org)](https://wiki.archlinux.org/index.php/Security)
+- [Security hardening Red Hat Enterprise Linux (redhat.com)](https://access.redhat.com/documentation/en-us/red_hat_enterprise_linux/8/html/security_hardening/index)
 
-- [github: imthenachoman/How-To-Secure-A-Linux-Server](https://github.com/imthenachoman/How-To-Secure-A-Linux-Server)
-- [Security hardening Red Hat Enterprise Linux](https://access.redhat.com/documentation/en-us/red_hat_enterprise_linux/8/html/security_hardening/index)
+### In Chapter 2: SSH
+- [Security Guidelines: OpenSSH (mozilla.org)](https://infosec.mozilla.org/guidelines/openssh.html)
+- [OpenSSH Security (openssh.com)](https://www.openssh.com/security.html)
 
-### SSH
+### In Chapter 3: Firewall
+- [How To Set Up a Firewall with UFW on Ubuntu 18.04 (digitalocean.com)](https://www.digitalocean.com/community/tutorials/how-to-set-up-a-firewall-with-ufw-on-ubuntu-18-04) (note: no differences on Ubuntu 20)
+- [Security - Firewall (ubuntu.com)](https://ubuntu.com/server/docs/security-firewall)
 
-- [Mozilla InfoSec: Security Guidelines: OpenSSH](https://infosec.mozilla.org/guidelines/openssh.html)
+### In Chapter 4: NTP
+- [What is NTP? (ntp.org)](http://www.ntp.org/ntpfaq/NTP-s-def.htm)
 
-### Firewall
+### In Chapter 6: File systems
+- [Restricting Access to Process Directories (redhat.com)](https://access.redhat.com/documentation/en-us/red_hat_enterprise_linux/5/html/deployment_guide/ch-proc#s2-Restricting_Access_to_Process_Directories)
 
-- [Security - Firewall | Ubuntu](https://ubuntu.com/server/docs/security-firewall)
-- [How To Set Up a Firewall with UFW on Ubuntu 18.04](https://www.digitalocean.com/community/tutorials/how-to-set-up-a-firewall-with-ufw-on-ubuntu-18-04) (note: no differences on Ubuntu 20)
+### In Chapter 7: Reports
+- [What is a rootkit, and how to stop them (norton.com)](https://us.norton.com/internetsecurity-malware-what-is-a-rootkit-and-how-to-stop-them.html)
 
-### File systems
+#### In Section 7.2: ClamAV
+- [Installation on Debian and Ubuntu Linux Distributions (clamav.net)](https://www.clamav.net/documents/installation-on-debian-and-ubuntu-linux-distributions)
 
-- [Restricting Access to Process Directories](https://access.redhat.com/documentation/en-us/red_hat_enterprise_linux/5/html/deployment_guide/ch-proc#s2-Restricting_Access_to_Process_Directories)
+#### In Section 7.6: AIDE
+- [The AIDE Manual (aide.github.io)](https://aide.github.io/doc/#config)
 
-### Web
+### In Chapter 8: Kernel `sysctl`
+- [`sysctl` - Arch Linux Wiki (archlinux.org)](https://wiki.archlinux.org/index.php/Sysctl#TCP/IP_stack_hardening)
 
-- [Mozilla InfoSec: Security Guidelines: Web Security](https://infosec.mozilla.org/guidelines/web_security.html)
+### In Chapter 9: Sandboxes
+- [`man firejail` (firejail.wordpress.com)](https://firejail.wordpress.com/features-3/man-firejail/)
+- [Building Custom Profiles (firejail.wordpress.com)](https://firejail.wordpress.com/documentation-2/building-custom-profiles/)
 
 <hr />
 
@@ -143,7 +153,7 @@ Isolate programs in their own virtual machine to limit access to real resources.
   - 9.2 [Create profiles for programs in `firejail`](#92-create-profiles-for-programs-in-firejail) 
   - 9.3 [Run programs with `firejail` and jail options](#93-run-programs-with-firejail-and-jail-options)
 
-### Chapter 10: [Audit](#chapter-10-audit-1)
+### Chapter 10: [Audits](#chapter-10-audit-1)
 Check the security of the server by running standardized audit software to report common weaknesses.
 
   - 10.0 [`lynis`](#100-lynis)
@@ -158,6 +168,9 @@ There's all sorts of other things to do beyond the scope of this guide. It's jus
   - 99.1 [Separate partitions](#991-separate-partitions) #TODO
   - 99.2 [Good password policy](#992-good-password-policy) #TODO
   - 99.3 [Process accounting](#993-process-accounting) #TODO
+  - 99.4 [Two-factor authentication in SSH](#994-two-factor-authentication-in-ssh) #TODO
+  - 99.5 [Restrict USB devices with `usbguard`](#995-restrict-usb-devices-with-usbguard) #TODO
+  - 99.6 [Hardware security](#996-hardware-security) #TODO
 
 <hr />
 
@@ -216,7 +229,7 @@ Create SSH key login for local machine.
 &#9745; **Login with SSH key**
 
 ### **Why...**
-**Login with SSH key**? SSH keys are 256 bits, longer than most passwords, and do not need to be sent to the server like a password. **However, anyone who can read the private key file can login.** Secure these files, and the machine(s) storing them!
+**Login with SSH key**? SSH keys are 256 bits, longer than most passwords, and do not need to be sent to the server like a password. **However, anyone who can read the private key file can login.** Secure these files, and the machine(s) storing them! **SSH keys can also be secured by a password, creating another layer.**
 
 *Note: `id_some`, `id_some.pub`, and `config` all belong on local machine. Server only needs `authorized_keys`.*
 
@@ -225,6 +238,7 @@ Use a custom Gmail account for the server instead of a personal address. **This 
 *Note: When prompted, "Enter a file in which to save the key", provide path: `/home/$USER/.ssh/id_some` where `some` is something memorable*
 ```bash
 # When prompted, "Enter a file in which to save the key", provide path: `/home/$USER/.ssh/id_some` where `some` is something memorable
+# When prompted, please consider providing another unique password for the SSH key
 ssh-keygen -t ed25519 -C "myserver@gmail.com" # Generate SSH keypair
 ssh-add ~/.ssh/id_some # Register new keypair with sshd
 ```
@@ -432,7 +446,7 @@ sudo ufw allow out whois comment 'WHOIS'
 ```
 
 ### 3.2 Allow services in: SSH
-*Note: SSH connections are set to `limit` instead of `allow` to use UFW's built in rate-limiting to prevent attacks.*
+*Note: SSH connections are set to `limit` instead of `allow` to use UFW's built in rate-limiting to mitigate attacks.*
 
 ```bash
 sudo ufw limit in 54321 comment 'SSH' # Replace 54321 by custom SSH port, or ssh if using default
@@ -442,7 +456,7 @@ sudo ufw limit in 54321 comment 'SSH' # Replace 54321 by custom SSH port, or ssh
 **Before proceeding**, open another SSH connection. `ufw enable` will close current SSH terminal if rules were set incorrectly.
 
 ```bash
-sudo ufw enable
+sudo ufw enable # Turns on firewall rules
 sudo ufw status
 ```
 
@@ -450,6 +464,12 @@ sudo ufw status
 Synchronize system time with the internet via Network Time Protocol.
 
 *Note: NTP requires an open port specified in [Chapter 3: Firewall](#chapter-3-firewall).*
+
+### **Objectives**
+&#9745; **Enable NTP**
+
+### **Why...**
+**Enable NTP?** Servers rely on exact time and the best way to accomplish that is to synchronize with Internet time servers.
 
 ### 4.0 Edit NTP configuration
 ```bash
@@ -476,7 +496,7 @@ Allow the server to send email logs securely to Gmail.
 &#9745; **Login to Gmail**
 
 ### **Why...**
-**Login to Gmail?** Gmail is easy and free to set up. Also eliminates the need to run a full mail server.
+**Login to Gmail?** Gmail is easy and free to set up. Also eliminates the need to run a full mail server (our `exim4` is send-only).
 
 ### 5.0 Install mail server (`exim4`)
 `openssl` and `ca-certificates` are also needed to log into Gmail servers.
@@ -576,8 +596,16 @@ sudo tail /var/log/exim4/mainlog # Read log results, especially if the test does
 ## Chapter 6: File systems
 Hide process ID file descriptors in `/proc`, and set stricter default file and folder permissions.
 
+### **Objectives**
+&#9745; **Hide process files in `/proc`**<br>
+&#9745; **Set default permissions**
+
+### **Why...**
+**Hide process files in `/proc`?** In Linux, a file is created in `/proc` for every active process. By default, those are readable by all users. We can change this behavior so only root can see them.<br>
+**Set default permissions?** The default permissions set for new files is quite permissive. Generally speaking most files can be limited to at least exclude other users. If someone gains control of one account, the damage is heavily mitigated.
+
 ### 6.0 Hide process files in `proc`
-Per [`man proc`](https://linux.die.net/man/5/proc), by default there is a readable file for every process running on the system inside `/proc/`, e.g., `/proc/1`.
+Per [`man proc`](https://linux.die.net/man/5/proc), by default there is a file for every process running on the system inside `/proc/`, e.g., `/proc/1`, and that file happens to be readable by all users.
 
 ```bash
 echo -e "\nproc    /proc    proc    defaults,hidepid=2    0    0" | sudo tee -a /etc/fstab
@@ -585,12 +613,40 @@ sudo reboot
 ```
 
 ### 6.1 Set default permissions
+Permissions sets can be described in a few different formats, but the most common number format representation of the following defaults is `027` or `0027`.
+
+It is worth learning about permissions to further restrict files where possible (e.g., `.ssh` folder).
+
 ```bash
+# Equivalent to code "027" or "0027"
+#
+# u=rwx | User can do anything
+# g=rx | User's groups can read and execute
+# o= | Other users can't do anything
 umask u=rwx,g=rx,o= # Sets default permissions for files created going forward
 ```
 
 ## Chapter 7: Reports
 Run scans for viruses, monitor intrusions, and more. Email results in human-readable format ondemand and daily.
+
+### **Objectives**
+&#9745; **Daily reports about everything**<br>
+&#9745; **Automatic updates**<br>
+&#9745; **Antivirus**<br>
+&#9745; **Rootkit detection**<br>
+&#9745; **Host intrusion detection**<br>
+&#9745; **App intrusion detection**<br>
+&#9745; **File system monitoring**<br>
+&#9745; **ARP monitoring**<br>
+
+### **Why...**
+**Daily reports about everything?** The server's security depends on its administrator keeping track of it every day. It is painful to bring all the system logs together and create filters on them which extract the most pertinent information (most logs spit out a LOT of data). `logwatch` can do all of that.<br>
+**Automatic updates?** Sometimes, the administrator can't be available for some time, but staying up to date is one of the most important objectives.<br>
+**Rootkit detection?** _<br>
+**Host intrusion detection?** _<br>
+**App intrusion detection?** _<br>
+**File system monitoring?** _<br>
+**ARP monitoring?** _<br>
 
 ### 7.0 Daily reports about everything (`logwatch`)
 Logwatch is an extremely convenient tool that creates a human readable compilation of reports based on what's found in `/var/log`. By default, Logwatch includes things like disk and network usage and SSH traffic. Notably, Logwatch includes log file filters, e.g. SSH failed connections are printed as one line per user.
@@ -669,12 +725,12 @@ Unattended-Upgrade::Automatic-Reboot-WithUsers "true";
 ```
 
 ### 7.2 Antivirus (`clamav`)
-The default settings run definitions updates once an hour. `clamav` will automatically scan files.
+Default settings run definitions updates once an hour. Installing `clamdscan` enables automatic scanning on network. `freshclam` and `clamd` services automatically start. 
+
+*Note: Never run `clamav` as root. `clamav` works by essentially opening every file it scans.*
 
 ```bash
-sudo apt install clamav clamav-freshclam clamav-daemon
-sudo service clamav-freshclam start
-sudo service clamav-freshclam status
+sudo apt install clamav clamav-freshclam clamav-daemon clamdscan
 ```
 
 ### 7.3 Rootkit detection (`rkhunter`, `chkrootkit`)
@@ -785,7 +841,9 @@ sudo fail2ban-client status
 ```
 
 ### 7.6 File system integrity monitoring (`aide`)
-Monitors files and notifies when changes are detected.
+Monitors files and notifies when changes are detected. 
+
+Understand that **lots** of files get changed all the time, so there is a lot of garbage in the output by default. See [Section 7.6.4](#).
 
 #### 7.6.0 Install `aide`
 ```bash
@@ -803,7 +861,27 @@ Edit `/etc/default/aide`:
 CRON_DAILY_RUN=yes
 ```
 
-#### 7.6.3 Maintain
+#### 7.6.3 Exclude files and folders
+The safest way to exclude files from monitoring is to match regex patterns as closely as possible, avoiding blanket rules. Finding a balance between convenience and actual value from file integrity monitoring is challenging.
+
+To add exclusions, add something like the following to the end of `/etc/aide/aide.conf`:
+```bash
+# You can also create custom rules - my home made rule definition goes like this
+#
+MyRule = p+i+n+u+g+s+b+m+c+md5+sha1
+
+# Next decide what directories/files you want in the database
+
+/etc p+i+u+g     #check only permissions, inode, user and group for etc
+/bin MyRule      # apply the custom rule to the files in bin
+/sbin MyRule     # apply the same custom rule to the files in sbin
+/var MyRule
+!/var/log/.*     # ignore the log dir it changes too often
+!/var/spool/.*   # ignore spool dirs as they change too often
+!/var/adm/utmp$  # ignore the file /var/adm/utmp
+```
+
+#### 7.6.4 Maintain
 Each time a known change is made to a file inside AIDE's scope, update the database with:
 ```bash
 sudo aideinit -y -f
@@ -830,9 +908,18 @@ TODO
 ## Chapter 9: Sandboxes
 Isolate programs in their own virtual machine to limit access to real resources. The guide uses Firejail, but Docker is a great alternative.
 
+### **Objectives**
+&#9745; **Run programs with `firejail`**<br>
+&#9745; **Create profiles for programs in `firejail`**
+
+### **Why...**
+**Run programs with `firejail`?** Most programs do not need access to the vast majority of the resources available to the machine. Allowing that access creates a large area for exposure.<br>
+**Create profiles for programs in `firejail`?** Some programs are not compatible with the default `firejail` profile and require custom profiles to function correctly. That isn't a bad thing - `firejail` is designed to adapt because programs have very different sets of requirements.
+
 ### 9.0 Install `firejail`
 ```bash
 sudo apt install firejail firejail-profiles
+sudo firecfg # Generates profiles automatically for existing programs
 ```
 
 ### 9.1 Run programs with `firejail`
@@ -857,8 +944,14 @@ It is also possible to launch an application with the `firejail` command includi
 firejail --noprofile --disable-mnt --no3d ... -- my-program ...
 ```
 
-## Chapter 10: Audit
+## Chapter 10: Audits
 Check the security of the server by running standardized audit software to report common weaknesses.
+
+### **Objectives**
+&#9745; **Audit system with Lynis**
+
+### **Why...**
+**Audit system with Lynis**? Lynis will provide hundreds of suggestions on specific changes that can be made to improve security. A great way to jump into more security subjects.
 
 ### 10.0 `lynis`
 ```
@@ -883,3 +976,12 @@ TODO
 
 ### 99.3 Process accounting
 TODO
+
+### 99.4 Two-factor authentication in SSH
+#TODO 
+
+### 99.5 Restrict USB devices with `usbguard`
+#TODO 
+
+### 99.6 Hardware security
+#TODO
