@@ -49,4 +49,3 @@ There are several ways to recover a broken system.
 ### Basic networking experience
 - Ports
 - Firewalls
-
