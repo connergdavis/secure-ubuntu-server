@@ -23,7 +23,7 @@
 ### In Chapter 4: NTP
 - [What is NTP? (ntp.org)](http://www.ntp.org/ntpfaq/NTP-s-def.htm)
 
-### In Chapter 6: File systems
+### In Chapter 5: File systems
 - [Restricting Access to Process Directories (redhat.com)](https://access.redhat.com/documentation/en-us/red_hat_enterprise_linux/5/html/deployment_guide/ch-proc#s2-Restricting_Access_to_Process_Directories)
 
 ### In Chapter 7: Reports
@@ -89,26 +89,26 @@ Synchronize system time with the internet via Network Time Protocol.
   - 4.0 [Edit NTP configuration](#40-edit-ntp-configuration)
   - 4.1 [Restart service](#41-restart-service)
 
-### Chapter 5: [Email](#chapter-5-email-1)
+### Chapter 5: [File systems](#chapter-6-file-systems-1)
+Hide process ID file descriptors in `/proc`, and set stricter default file and folder permissions.
+
+  - 5.0 [Hide process files in `/proc`](#50-hide-process-files-in-proc)
+  - 5.1 [Set default permissions](#51-set-default-permissions)
+
+### Chapter 6: [Email](#chapter-5-email-1)
 Allow the server to send email logs securely to Gmail.
 
 *Note: Email requires an open port specified in [Chapter 3: Firewall](#chapter-3-firewall).*
 
-  - 5.0 [Install mail server (`exim4`)](#50-install-mail-server-exim4)
-  - 5.1 [Configure `exim4`](#51-configure-exim4)
-  - 5.2 [Create Gmail login](#52-create-gmail-login)
-  - 5.3 [Protect Gmail login](#53-protect-gmail-login)
-  - 5.4 [Generate login certificate](#54-generate-login-certificate)
-  - 5.5 [Login to Gmail](#55-login-to-gmail)
-  - 5.6 [Edit `/etc/aliases`](#56-edit-etcaliases)
-  - 5.7 [Restart `exim4`](#57-restart-exim4)
-  - 5.8 [Send test email](#58-send-test-email)
-
-### Chapter 6: [File systems](#chapter-6-file-systems-1)
-Hide process ID file descriptors in `/proc`, and set stricter default file and folder permissions.
-
-  - 6.0 [Hide process files in `/proc`](#60-hide-process-files-in-proc)
-  - 6.1 [Set default permissions](#61-set-default-permissions)
+  - 6.0 [Install mail server (`exim4`)](#60-install-mail-server-exim4)
+  - 6.1 [Configure `exim4`](#61-configure-exim4)
+  - 6.2 [Create Gmail login](#62-create-gmail-login)
+  - 6.3 [Protect Gmail login](#63-protect-gmail-login)
+  - 6.4 [Generate login certificate](#64-generate-login-certificate)
+  - 6.5 [Login to Gmail](#65-login-to-gmail)
+  - 6.6 [Edit `/etc/aliases`](#66-edit-etcaliases)
+  - 6.7 [Restart `exim4`](#67-restart-exim4)
+  - 6.8 [Send test email](#68-send-test-email)
 
 ### Chapter 7: [Reports](#chapter-7-reports-1)
 Run scans for viruses, monitor intrusions, and more. Email results in human-readable format ondemand and daily.
@@ -128,14 +128,14 @@ Run scans for viruses, monitor intrusions, and more. Email results in human-read
     - 7.4.1 [Install `ossec`](#741-install-ossec)
   - 7.5 [App intrusion detection (`fail2ban`)](#75-app-intrusion-detection-fail2ban)
     - 7.5.0 [Install `fail2ban`](#750-install-fail2ban)
-    - 7.5.1 [Edit global config](#751-edit-global-config)
+    - 7.5.1 [Edit `/etc/fail2ban/jail.local`](#751-edit-etcfail2banjaillocal)
     - 7.5.2 [Create jails](#752-create-jails)
     - 7.5.3 [Enable `fail2ban`](#753-enable-fail2ban)
     - 7.5.4 [Check jail statuses](#754-check-jail-statuses)
   - 7.6 [File system integrity monitoring (`aide`)](#76-file-system-integrity-monitoring-aide)
-    - 7.6.0 [Install `aide`](#761-install-aide)
-    - 7.6.1 [Create initial database](#762-create-initial-database)
-    - 7.6.2 [Configure daily checks](#763-configure-daily-checks)
+    - 7.6.0 [Install `aide`](#760-install-aide)
+    - 7.6.1 [Create initial database](#761-create-initial-database)
+    - 7.6.2 [Configure daily checks](#762-configure-daily-checks)
   - 7.7 [ARP monitoring (`arpwatch`)](#77-arp-monitoring-arpwatch)
 
 ### Chapter 8: [Kernel `sysctl`](#chapter-8-kernel-sysctl-1)
@@ -153,7 +153,7 @@ Isolate programs in their own virtual machine to limit access to real resources.
   - 9.2 [Create profiles for programs in `firejail`](#92-create-profiles-for-programs-in-firejail) 
   - 9.3 [Run programs with `firejail` and jail options](#93-run-programs-with-firejail-and-jail-options)
 
-### Chapter 10: [Audits](#chapter-10-audit-1)
+### Chapter 10: [Audits](#chapter-10-audits-1)
 Check the security of the server by running standardized audit software to report common weaknesses.
 
   - 10.0 [`lynis`](#100-lynis)
@@ -219,6 +219,8 @@ sudo addgroup suers
 sudo usermod -a -G suers $USER
 sudo dpkg-statoverride --update --add root suers 4750 /bin/su # Now `su` can only be run by members of group `suers`
 ```
+
+<hr />
 
 ## Chapter 1: Local SSH
 Create SSH key login for local machine.
@@ -290,6 +292,8 @@ Close existing SSH to `root` upon success.
 ```bash
 ssh some
 ```
+
+<hr />
 
 ## Chapter 2: SSH
 Tweak `sshd`'s configuration to provide much better security.
@@ -395,7 +399,7 @@ PermitRootLogin No
 UsePrivilegeSeparation sandbox
 ```
 
-### 2.3 Check for errors in `sshd_config`
+### 2.3 Check for errors in `/etc/ssh/sshd_config`
 Errors will be returned if there are any. Successful output will list every entry and value found in `sshd_config`, e.g. `permitrootlogin no`.
 
 ```bash
@@ -411,6 +415,8 @@ An additional requirement of Firefox InfoSec guidelines on OpenSSH.
 sudo awk '$5 >= 3071' /etc/ssh/moduli | sudo tee /etc/ssh/moduli.tmp # Strip moduli < 3072 bits long
 sudo mv /etc/ssh/moduli.tmp /etc/ssh/moduli
 ```
+
+<hr />
 
 ## Chapter 3: Firewall
 Use `ufw` to block all traffic by default, then explicitly allow certain services.
@@ -460,6 +466,8 @@ sudo ufw enable # Turns on firewall rules
 sudo ufw status
 ```
 
+<hr />
+
 ## Chapter 4: NTP
 Synchronize system time with the internet via Network Time Protocol.
 
@@ -486,7 +494,44 @@ sudo service ntp status # Checks on status of service with latest stdout, will r
 sudo ntpq -p # Prints NTP peer status
 ```
 
-## Chapter 5: Email
+<hr />
+
+## Chapter 5: File systems
+Hide process ID file descriptors in `/proc`, and set stricter default file and folder permissions.
+
+### **Objectives**
+&#9745; **Hide process files in `/proc`**<br>
+&#9745; **Set default permissions**
+
+### **Why...**
+**Hide process files in `/proc`?** In Linux, a file is created in `/proc` for every active process. By default, those are readable by all users. We can change this behavior so only root can see them.<br>
+**Set default permissions?** The default permissions set for new files is quite permissive. Generally speaking most files can be limited to at least exclude other users. If someone gains control of one account, the damage is heavily mitigated.
+
+### 5.0 Hide process files in `proc`
+Per [`man proc`](https://linux.die.net/man/5/proc), by default there is a file for every process running on the system inside `/proc/`, e.g., `/proc/1`, and that file happens to be readable by all users.
+
+```bash
+echo -e "\nproc    /proc    proc    defaults,hidepid=2    0    0" | sudo tee -a /etc/fstab
+sudo reboot
+```
+
+### 5.1 Set default permissions
+Permissions sets can be described in a few different formats, but the most common number format representation of the following defaults is `027` or `0027`.
+
+It is worth learning about permissions to further restrict files where possible (e.g., `.ssh` folder).
+
+```bash
+# Equivalent to code "027" or "0027"
+#
+# u=rwx | User can do anything
+# g=rx | User's groups can read and execute
+# o= | Other users can't do anything
+umask u=rwx,g=rx,o= # Sets default permissions for files created going forward
+```
+
+<hr />
+
+## Chapter 6: Email
 Allow the server to send email logs securely to Gmail.
 
 *Note: Email requires an open port specified in [Chapter 3: Firewall](#chapter-3-firewall).*
@@ -498,14 +543,14 @@ Allow the server to send email logs securely to Gmail.
 ### **Why...**
 **Login to Gmail?** Gmail is easy and free to set up. Also eliminates the need to run a full mail server (our `exim4` is send-only).
 
-### 5.0 Install mail server (`exim4`)
+### 6.0 Install mail server (`exim4`)
 `openssl` and `ca-certificates` are also needed to log into Gmail servers.
 
 ```bash
 sudo apt install exim4 openssl ca-certificates
 ```
 
-### 5.1 Configure `exim4`
+### 6.1 Configure `exim4`
 When prompted, continue with the default setting for all but the following options:
 
 | Please enter | ... |
@@ -519,7 +564,7 @@ When prompted, continue with the default setting for all but the following optio
 sudo dpkg-reconfigure exim4-config # Visual config instead of a file; navigate with arrow keys, Enter to go forward, Esc to go back
 ```
 
-### 5.2 Create Gmail login
+### 6.2 Create Gmail login
 Provide login credentials so `exim4` can send email on your behalf.
 
 Edit `/etc/exim4/passwd.client`:
@@ -529,7 +574,7 @@ smtp.gmail.com:address@gmail.com:password
 *.google.com:address@gmail.com:password
 ```
 
-### 5.3 Protect Gmail login
+### 6.3 Protect Gmail login
 
 Lock the new password file down.
 
@@ -540,7 +585,7 @@ sudo chown root:Debian-exim /etc/exim4/passwd.client # `Debian-exim` is the defa
 sudo chmod 640 /etc/exim4/passwd.client
 ```
 
-### 5.4 Generate login certificate
+### 6.4 Generate login certificate
 Create a TLS certificate `exim4` can use to login to Gmail servers.
 
 When prompted, provide the following specific answers:
@@ -554,7 +599,7 @@ When prompted, provide the following specific answers:
 sudo bash /usr/share/doc/exim4-base/examples/exim-gencert # exim4 provides a script to do this automatically
 ```
 
-### 5.5 Login to Gmail
+### 6.5 Login to Gmail
 Finally, configure `exim4` to connect to Gmail servers using your account.
 
 Edit `/etc/exim4/exim4.conf.localmacros`:
@@ -574,57 +619,26 @@ sudo sed -i -r -e '/^.ifdef REMOTE_SMTP_SMARTHOST_HOSTS_REQUIRE_TLS$/I { :a; n; 
 sudo sed -i -r -e "/\.ifdef MAIN_TLS_ENABLE/ a\n .ifdef TLS_ON_CONNECT_PORTS\n tls_on_connect_ports = TLS_ON_CONNECT_PORTS\n.endif\n" /etc/exim4/exim4.conf.template
 ```
 
-### 5.6 Edit `/etc/aliases`
+### 6.6 Edit `/etc/aliases`
 To avoid copying the email address to every application that will send mail, overwrite the `root` mail alias. That's a lot easier than copying the email address for each program that sends mail.
 
 ```
 root: address@gmail.com
 ```
 
-### 5.7 Restart `exim4`
+### 6.7 Restart `exim4`
 ```bash
 sudo update-exim4.conf # Will output config errors, if there are any
 sudo service exim4 restart
 ```
 
-### 5.8  Send test email
+### 6.8  Send test email
 ```bash
 echo "Test" | mail -s "Test" address@gmail.com
 sudo tail /var/log/exim4/mainlog # Read log results, especially if the test doesn't work!
 ```
 
-## Chapter 6: File systems
-Hide process ID file descriptors in `/proc`, and set stricter default file and folder permissions.
-
-### **Objectives**
-&#9745; **Hide process files in `/proc`**<br>
-&#9745; **Set default permissions**
-
-### **Why...**
-**Hide process files in `/proc`?** In Linux, a file is created in `/proc` for every active process. By default, those are readable by all users. We can change this behavior so only root can see them.<br>
-**Set default permissions?** The default permissions set for new files is quite permissive. Generally speaking most files can be limited to at least exclude other users. If someone gains control of one account, the damage is heavily mitigated.
-
-### 6.0 Hide process files in `proc`
-Per [`man proc`](https://linux.die.net/man/5/proc), by default there is a file for every process running on the system inside `/proc/`, e.g., `/proc/1`, and that file happens to be readable by all users.
-
-```bash
-echo -e "\nproc    /proc    proc    defaults,hidepid=2    0    0" | sudo tee -a /etc/fstab
-sudo reboot
-```
-
-### 6.1 Set default permissions
-Permissions sets can be described in a few different formats, but the most common number format representation of the following defaults is `027` or `0027`.
-
-It is worth learning about permissions to further restrict files where possible (e.g., `.ssh` folder).
-
-```bash
-# Equivalent to code "027" or "0027"
-#
-# u=rwx | User can do anything
-# g=rx | User's groups can read and execute
-# o= | Other users can't do anything
-umask u=rwx,g=rx,o= # Sets default permissions for files created going forward
-```
+<hr />
 
 ## Chapter 7: Reports
 Run scans for viruses, monitor intrusions, and more. Email results in human-readable format ondemand and daily.
@@ -798,6 +812,7 @@ sudo apt install fail2ban
 ```
 
 #### 7.5.1 Edit `/etc/fail2ban/jail.local`
+`fail2ban` will recognize this as a configuration file.
 ```bash
 [DEFAULT]
 # Ignore self
@@ -893,6 +908,8 @@ sudo apt install arpwatch
 sudo service arpwatch start
 ```
 
+<hr />
+
 ## Chapter 8: Kernel `sysctl`
 Edit `/etc/sysctl.conf` kernel options to comply with stricter security standards.
 
@@ -904,6 +921,8 @@ TODO
 
 ### 8.2 Restart server
 TODO
+
+<hr />
 
 ## Chapter 9: Sandboxes
 Isolate programs in their own virtual machine to limit access to real resources. The guide uses Firejail, but Docker is a great alternative.
@@ -944,6 +963,8 @@ It is also possible to launch an application with the `firejail` command includi
 firejail --noprofile --disable-mnt --no3d ... -- my-program ...
 ```
 
+<hr />
+
 ## Chapter 10: Audits
 Check the security of the server by running standardized audit software to report common weaknesses.
 
@@ -959,8 +980,12 @@ sudo apt install lynis
 sudo lynis audit system
 ```
 
+<hr />
+
 ## Chapter 98: Keep local system safe
 It's fun to set up a `firejail` for every process and receive daily reports about file system integrity, but none of that matters if the local machine used to connect is breached. The SSH key and sudoer password are essential to the security of the system. Systems used to connect should ideally be just as safe as the server itself.
+
+<hr />
 
 ## Chapter 99: Optional extras
 There's all sorts of other things to do beyond the scope of this guide. It's just a starting point.
