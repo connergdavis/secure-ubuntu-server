@@ -13,6 +13,12 @@
 - [Security - Arch Linux Wiki (archlinux.org)](https://wiki.archlinux.org/index.php/Security)
 - [Security hardening Red Hat Enterprise Linux (redhat.com)](https://access.redhat.com/documentation/en-us/red_hat_enterprise_linux/8/html/security_hardening/index)
 
+### In Chapter 0: Introduction
+TODO
+
+### In Chapter 1: Local SSH
+TODO
+
 ### In Chapter 2: SSH
 - [Security Guidelines: OpenSSH (mozilla.org)](https://infosec.mozilla.org/guidelines/openssh.html)
 - [OpenSSH Security (openssh.com)](https://www.openssh.com/security.html)
@@ -74,7 +80,7 @@ Tweak `sshd`'s configuration to provide much better security.
   - 2.0 [Disable root user](#20-disable-root-user)
   - 2.1 [Create SSH group](#21-create-ssh-group)
   - 2.2 [Secure `sshd`](#22-secure-sshd)
-  - 2.3 [Check for errors in `/etc/ssh/sshd_config`](#23-check-for-errors-in-etcsshd_config)
+  - 2.3 [Check for errors in `/etc/ssh/sshd_config`](#23-check-for-errors-in-etcsshsshd_config)
   - 2.4 [Only use long Diffie-Hellman moduli](#24-only-use-long-diffie-hellman-moduli)
 
 ### Chapter 3: [Firewall](#chapter-3-firewall-1)
@@ -90,14 +96,16 @@ Synchronize system time with the internet via Network Time Protocol.
 
 *Note: NTP requires an open port specified in [Chapter 3: Firewall](#chapter-3-firewall).*
 
-  - 4.0 [Edit NTP configuration](#40-edit-ntp-configuration)
-  - 4.1 [Restart service](#41-restart-service)
+  - 4.0 [Install NTP](#40-install-ntp)
+  - 4.0 [Edit NTP configuration](#41-edit-ntp-configuration)
+  - 4.1 [Restart service](#42-restart-service)
 
-### Chapter 5: [File systems](#chapter-6-file-systems-1)
-Hide process ID file descriptors in `/proc`, and set stricter default file and folder permissions.
+### Chapter 5: [File permissions](#chapter-6-file-permissions-1)
+Improve the security of the file system by restricting permissions on popular files.
 
   - 5.0 [Hide process files in `/proc`](#50-hide-process-files-in-proc)
   - 5.1 [Set default permissions](#51-set-default-permissions)
+  - 5.2 [Update insecure permissions](#52-update-insecure-permissions)
 
 ### Chapter 6: [Email](#chapter-5-email-1)
 Allow the server to send email logs securely to Gmail.
@@ -121,46 +129,59 @@ Run scans for viruses, monitor intrusions, and more. Email results in human-read
   - 7.1 [Automatic updates (`unattended-upgrades`)](#71-automatic-updates-unattended-upgrades)
     - 7.1.0 [Install `unattended-upgrades`](#710-install-unattended-upgrades)
     - 7.1.1 [Edit `/etc/apt/apt.conf.d/51myunattended-upgrades`](#711-edit-etcaptaptconfd51myunattended-upgrades)
-  - 7.2 [Antivirus (`clamav`)](#72-antivirus-clamav)
-  - 7.3 [Rootkit detection (`rkhunter`, `chkrootkit`)](#73-rootkit-detection-rkhunter-chkrootkit)
-    - 7.3.0 [Install packages](#730-install-packages)
-    - 7.3.1 [Enable cron scripts](#731-enable-cron-scripts)
-    - 7.3.2 [Edit `/etc/rkhunter.conf`](#732-edit-etcrkhunterconf)
-    - 7.3.3 [Update `rkhunter`](#733-update-rkhunter)
-  - 7.4 [Host intrusion detection (`ossec`)](#74-host-intrusion-detection-ossec)
-    - 7.4.0 [Prepare to build from source](#740-prepare-to-build-from-source)
-    - 7.4.1 [Install `ossec`](#741-install-ossec)
-  - 7.5 [App intrusion detection (`fail2ban`)](#75-app-intrusion-detection-fail2ban)
-    - 7.5.0 [Install `fail2ban`](#750-install-fail2ban)
-    - 7.5.1 [Edit `/etc/fail2ban/jail.local`](#751-edit-etcfail2banjaillocal)
-    - 7.5.2 [Create jails](#752-create-jails)
-    - 7.5.3 [Enable `fail2ban`](#753-enable-fail2ban)
-    - 7.5.4 [Check jail statuses](#754-check-jail-statuses)
-  - 7.6 [File system integrity monitoring (`aide`)](#76-file-system-integrity-monitoring-aide)
-    - 7.6.0 [Install `aide`](#760-install-aide)
-    - 7.6.1 [Create initial database](#761-create-initial-database)
-    - 7.6.2 [Configure daily checks](#762-configure-daily-checks)
-  - 7.7 [ARP monitoring (`arpwatch`)](#77-arp-monitoring-arpwatch)
 
-### Chapter 8: [Kernel `sysctl`](#chapter-8-kernel-sysctl-1)
+### Chapter 8: [File integrity](#chapter-8-file-integrity-1)
+Keep track of the specific changes to files in the system.
+
+- 8.0 [Host intrusion detection (`ossec`)](#80-host-intrusion-detection-ossec)
+  - 8.0.0 [Prepare to build from source](#800-prepare-to-build-from-source)
+  - 8.0.1 [Install `ossec`](#801-install-ossec)
+- 8.1 [File system integrity monitoring (`aide`)](#81-file-system-integrity-monitoring-aide)
+  - 8.1.0 [Install `aide`](#810-install-aide)
+  - 8.1.1 [Create initial database](#811-create-initial-database)
+  - 8.1.2 [Configure daily checks](#812-configure-daily-checks)
+
+### Chapter 9: [Malware](#chapter-9-malware-1)
+Automatically scan network traffic for malware and set up rootkit detection.
+
+- 9.0 [Antivirus (`clamav`)](#90-antivirus-clamav)
+- 9.1 [Rootkit detection (`rkhunter`, `chkrootkit`)](#91-rootkit-detection-rkhunter-chkrootkit)
+  - 9.1.0 [Install packages](#910-install-packages)
+  - 9.1.1 [Enable cron scripts](#911-enable-cron-scripts)
+  - 9.1.2 [Edit `/etc/rkhunter.conf`](#912-edit-etcrkhunterconf)
+  - 9.1.3 [Update `rkhunter`](#913-update-rkhunter)
+
+### Chapter 10: [Network](#chapter-10-network-1)
+Watch out for intrusive computers on LAN and the Internet.
+
+- 10.0 [App intrusion detection (`fail2ban`)](#100-app-intrusion-detection-fail2ban)
+  - 10.0.0 [Install `fail2ban`](#1000-install-fail2ban)
+  - 10.0.1 [Edit `/etc/fail2ban/jail.local`](#1001-edit-etcfail2banjaillocal)
+  - 10.0.2 [Create jails](#1002-create-jails)
+  - 10.0.3 [Enable `fail2ban`](#1003-enable-fail2ban)
+  - 10.0.4 [Check jail statuses](#1004-check-jail-statuses)
+- 10.1 [ARP monitoring (`arpwatch`)](#101-arp-monitoring-arpwatch)
+
+### Chapter 11: [Kernel `sysctl`](#chapter-11-kernel-sysctl-1)
 Edit `/etc/sysctl.conf` kernel options to comply with stricter security standards.
 
-  - 8.0 [Edit `/etc/sysctl.conf`](#80-edit-etcsysctlconf) #TODO
-  - 8.1 [Test new settings](#81-test-new-settings) #TODO
-  - 8.2 [Restart server](#82-restart-server) #TODO
+  - 11.0 [Edit `/etc/sysctl.conf`](#110-edit-etcsysctlconf)
+  - 11.1 [Test new settings](#111-test-new-settings)
+  - 11.2 [Restart server](#112-restart-server)
 
-### Chapter 9: [Sandboxes](#chapter-9-sandboxes-1)
+### Chapter 12: [Sandboxes](#chapter-12-sandboxes-1)
 Isolate programs in their own virtual machine to limit access to real resources. The guide uses Firejail, but Docker is a great alternative.
 
-  - 9.0 [Install `firejail`](#90-install-firejail)
-  - 9.1 [Run programs with `firejail`](#91-run-programs-with-firejail)
-  - 9.2 [Create profiles for programs in `firejail`](#92-create-profiles-for-programs-in-firejail) 
-  - 9.3 [Run programs with `firejail` and jail options](#93-run-programs-with-firejail-and-jail-options)
+- 12.0 [Install `firejail`](#120-install-firejail)
+- 12.1 [Run programs with `firejail`](#121-run-programs-with-firejail)
+- 12.2 [Create profiles for programs in `firejail`](#122-create-profiles-for-programs-in-firejail) 
+- 12.3 [Run programs with `firejail` and jail options](#123-run-programs-with-firejail-and-jail-options)
+- 12.4 [Run daemons with `firejail`](#124-run-daemons-with-firejail)
 
-### Chapter 10: [Audits](#chapter-10-audits-1)
+### Chapter 13: [Audits](#chapter-13-audits-1)
 Check the security of the server by running standardized audit software to report common weaknesses.
 
-  - 10.0 [`lynis`](#100-lynis)
+  - 13.0 [`lynis`](#130-lynis)
 
 ### Chapter 98: [Keep local system safe](#chapter-98-keep-local-system-safe-1)
 It's fun to set up a `firejail` for every process and receive daily reports about file system integrity, but none of that matters if the local machine used to connect is breached. The SSH key and sudoer password are essential to the security of the system. Systems used to connect should ideally be just as safe as the server itself.
@@ -324,6 +345,7 @@ Tweak `sshd`'s configuration to provide much better security.
 - [ ] Secure `sshd`
 > SSH port must be open to public all the time, and home network IP changes dynamically, so whitelists are not an option
 > for the average person.
+- [ ] Check for errors in `/etc/ssh/sshd_config`
 - [ ] Only use long Diffie-Hellman moduli
 > Recommended by Mozilla InfoSec.
 
@@ -523,7 +545,7 @@ sudo ntpq -p # Prints NTP peer status
 <hr />
 
 ## Chapter 5: File systems
-Hide process ID file descriptors in `/proc`, and set stricter default file and folder permissions.
+Improve the security of the file system by restricting permissions on popular files.
 
 ### Objectives
 - [ ] Hide process files in `/proc`
@@ -1056,9 +1078,6 @@ Check the security of the server by running standardized audit software to repor
 - [ ] Audit system with Lynis
 > Lynis will provide hundreds of suggestions on specific changes that can be made to improve security.
 > A great way to jump into more security subjects.
-
-### **Why...**
-**Audit system with Lynis**? 
 
 ### 10.0 `lynis`
 The latest version of `lynis` is not available on Ubuntu by default. The following installation instructions can be
