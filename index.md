@@ -42,6 +42,9 @@
 - [`man firejail` (firejail.wordpress.com)](https://firejail.wordpress.com/features-3/man-firejail/)
 - [Building Custom Profiles (firejail.wordpress.com)](https://firejail.wordpress.com/documentation-2/building-custom-profiles/)
 
+### In Chapter 10: Audits
+- [CISOfy Software Repository (cisofy.com)](https://packages.cisofy.com/community/#debian-ubuntu)
+
 <hr />
 
 ## Table of Contents
@@ -1007,8 +1010,19 @@ Check the security of the server by running standardized audit software to repor
 **Audit system with Lynis**? Lynis will provide hundreds of suggestions on specific changes that can be made to improve security. A great way to jump into more security subjects.
 
 ### 10.0 `lynis`
-```
+The latest version of `lynis` is not available on Ubuntu by default. The following installation instructions can be found at https://packages.cisofy.com/community/#debian-ubuntu. 
+
+```bash
+sudo apt install apt-transport-https
+# Add cisofy.com apt key
+sudo wget -O - https://packages.cisofy.com/keys/cisofy-software-public.key | sudo apt-key add -
+# Add lynis to apt sources
+echo "deb https://packages.cisofy.com/community/lynis/deb/ stable main" | sudo tee /etc/apt/sources.list.d/cisofy-lynis.list
+# Now apt will recognize cisofy.com and lynis
+sudo apt update
+# Add latest lynis (default apt install lynis is out of date)
 sudo apt install lynis
+# Run the actual audit
 sudo lynis audit system
 ```
 
