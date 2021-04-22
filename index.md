@@ -33,23 +33,30 @@ TODO
 ### In Chapter 5: File systems
 - [Restricting Access to Process Directories (redhat.com)](https://access.redhat.com/documentation/en-us/red_hat_enterprise_linux/5/html/deployment_guide/ch-proc#s2-Restricting_Access_to_Process_Directories)
 
+### In Chapter 6: Email
+TODO
+
 ### In Chapter 7: Reports
-- [What is a rootkit, and how to stop them (norton.com)](https://us.norton.com/internetsecurity-malware-what-is-a-rootkit-and-how-to-stop-them.html)
+TODO
 
-#### In Section 7.2: ClamAV
-- [Installation on Debian and Ubuntu Linux Distributions (clamav.net)](https://www.clamav.net/documents/installation-on-debian-and-ubuntu-linux-distributions)
-
-#### In Section 7.6: AIDE
+### In Chapter 8: File integrity
 - [The AIDE Manual (aide.github.io)](https://aide.github.io/doc/#config)
 
-### In Chapter 8: Kernel `sysctl`
+### In Chapter 9: Malware
+- [What is a rootkit, and how to stop them (norton.com)](https://us.norton.com/internetsecurity-malware-what-is-a-rootkit-and-how-to-stop-them.html)
+- [Installation on Debian and Ubuntu Linux Distributions (clamav.net)](https://www.clamav.net/documents/installation-on-debian-and-ubuntu-linux-distributions)
+
+### In Chapter 10: Network
+TODO
+
+### In Chapter 11: Kernel `sysctl`
 - [`sysctl` - Arch Linux Wiki (archlinux.org)](https://wiki.archlinux.org/index.php/Sysctl#TCP/IP_stack_hardening)
 
-### In Chapter 9: Sandboxes
+### In Chapter 12: Sandboxes
 - [`man firejail` (firejail.wordpress.com)](https://firejail.wordpress.com/features-3/man-firejail/)
 - [Building Custom Profiles (firejail.wordpress.com)](https://firejail.wordpress.com/documentation-2/building-custom-profiles/)
 
-### In Chapter 10: Audits
+### In Chapter 13: Audits
 - [CISOfy Software Repository (cisofy.com)](https://packages.cisofy.com/community/#debian-ubuntu)
 
 <hr />
@@ -100,14 +107,14 @@ Synchronize system time with the internet via Network Time Protocol.
   - 4.0 [Edit NTP configuration](#41-edit-ntp-configuration)
   - 4.1 [Restart service](#42-restart-service)
 
-### Chapter 5: [File permissions](#chapter-6-file-permissions-1)
+### Chapter 5: [File permissions](#chapter-5-file-permissions-1)
 Improve the security of the file system by restricting permissions on popular files.
 
   - 5.0 [Hide process files in `/proc`](#50-hide-process-files-in-proc)
   - 5.1 [Set default permissions](#51-set-default-permissions)
   - 5.2 [Update insecure permissions](#52-update-insecure-permissions)
 
-### Chapter 6: [Email](#chapter-5-email-1)
+### Chapter 6: [Email](#chapter-6-email-1)
 Allow the server to send email logs securely to Gmail.
 
 *Note: Email requires an open port specified in [Chapter 3: Firewall](#chapter-3-firewall).*
@@ -123,7 +130,7 @@ Allow the server to send email logs securely to Gmail.
   - 6.8 [Send test email](#68-send-test-email)
 
 ### Chapter 7: [Reports](#chapter-7-reports-1)
-Run scans for viruses, monitor intrusions, and more. Email results in human-readable format ondemand and daily.
+Email reports daily and as they happen.
 
   - 7.0 [Daily reports about everything (`logwatch`)](#70-daily-reports-about-everything-logwatch)
   - 7.1 [Automatic updates (`unattended-upgrades`)](#71-automatic-updates-unattended-upgrades)
@@ -167,7 +174,6 @@ Edit `/etc/sysctl.conf` kernel options to comply with stricter security standard
 
   - 11.0 [Edit `/etc/sysctl.conf`](#110-edit-etcsysctlconf)
   - 11.1 [Test new settings](#111-test-new-settings)
-  - 11.2 [Restart server](#112-restart-server)
 
 ### Chapter 12: [Sandboxes](#chapter-12-sandboxes-1)
 Isolate programs in their own virtual machine to limit access to real resources. The guide uses Firejail, but Docker is a great alternative.
@@ -181,7 +187,8 @@ Isolate programs in their own virtual machine to limit access to real resources.
 ### Chapter 13: [Audits](#chapter-13-audits-1)
 Check the security of the server by running standardized audit software to report common weaknesses.
 
-  - 13.0 [`lynis`](#130-lynis)
+- 13.0 [`lynis`](#130-lynis)
+- 13.1 [`tiger`](#131-tiger)
 
 ### Chapter 98: [Keep local system safe](#chapter-98-keep-local-system-safe-1)
 It's fun to set up a `firejail` for every process and receive daily reports about file system integrity, but none of that matters if the local machine used to connect is breached. The SSH key and sudoer password are essential to the security of the system. Systems used to connect should ideally be just as safe as the server itself.
@@ -189,13 +196,13 @@ It's fun to set up a `firejail` for every process and receive daily reports abou
 ### Chapter 99: [Optional extras](#chapter-99-optional-extras-1)
 There's all sorts of other things to do beyond the scope of this guide. It's just a starting point. Some feature may provide more security at the cost of being too inconvenient. For example, good password policy on a personal server is pointless. Some features may not be possible on virtual private server providers, like disk encryption.
 
-  - 99.0 [Disk encryption](#990-disk-encryption) #TODO
-  - 99.1 [Separate partitions](#991-separate-partitions) #TODO
-  - 99.2 [Good password policy](#992-good-password-policy) #TODO
-  - 99.3 [Process accounting](#993-process-accounting) #TODO
-  - 99.4 [Two-factor authentication in SSH](#994-two-factor-authentication-in-ssh) #TODO
-  - 99.5 [Restrict USB devices with `usbguard`](#995-restrict-usb-devices-with-usbguard) #TODO
-  - 99.6 [Hardware security](#996-hardware-security) #TODO
+  - 99.0 [Disk encryption](#990-disk-encryption) TODO
+  - 99.1 [Separate partitions](#991-separate-partitions) TODO
+  - 99.2 [Good password policy](#992-good-password-policy) TODO
+  - 99.3 [Process accounting](#993-process-accounting) TODO
+  - 99.4 [Two-factor authentication in SSH](#994-two-factor-authentication-in-ssh) TODO
+  - 99.5 [Restrict USB devices with `usbguard`](#995-restrict-usb-devices-with-usbguard) TODO
+  - 99.6 [Disable coredumps](#996-disable-coredumps) TODO
 
 <hr />
 
@@ -544,7 +551,7 @@ sudo ntpq -p # Prints NTP peer status
 
 <hr />
 
-## Chapter 5: File systems
+## Chapter 5: File permissions
 Improve the security of the file system by restricting permissions on popular files.
 
 ### Objectives
@@ -709,7 +716,7 @@ sudo tail /var/log/exim4/mainlog # Read log results, especially if the test does
 <hr />
 
 ## Chapter 7: Reports
-Run scans for viruses, monitor intrusions, and more. Email results in human-readable format ondemand and daily.
+Email reports daily and as they happen.
 
 ### Objectives
 - [ ] Daily reports about everything
@@ -805,60 +812,20 @@ Unattended-Upgrade::Automatic-Reboot "true";
 Unattended-Upgrade::Automatic-Reboot-WithUsers "true";
 ```
 
-### 7.2 Antivirus (`clamav`)
-Default settings run definitions updates once an hour. Installing `clamdscan` enables automatic scanning on network. 
-`freshclam` and `clamd` services automatically start. 
+<hr />
 
-*Note: Never run `clamav` as root. `clamav` works by essentially opening every file it scans.*
+## Chapter 8: File integrity
+Keep track of the specific changes to files in the system.
 
-```bash
-sudo apt install clamav clamav-freshclam clamav-daemon clamdscan
-```
-
-### 7.3 Rootkit detection (`rkhunter`, `chkrootkit`)
-#### 7.3.0 Install packages
-```bash
-sudo apt install rkhunter chkrootkit
-```
-
-#### 7.3.1 Enable cron scripts
-```bash
-# Select `Yes` when asked, *Should chkrootkit be run automatically every day?* Use default for everything else
-sudo dpkg-reconfigure chkrootkit
-# Select `Yes` for all prompts
-sudo dpkg-reconfigure rkhunter
-```
-
-#### 7.3.2 Edit `/etc/rkhunter.conf`
-```bash
-UPDATE_MIRRORS=1
-MIRRORS_MODE=0 # Use mirrors from the internet
-MAIL-ON-WARNING=root # Send mail to `root` alias
-COPY_LOG_ON_ERROR=1 # Copy error logs to file
-PKGMGR=NONE # Suggested value for Debian by docs
-PHALANX_DIRTEST=1 # Suggested by docs
-WEB_CMD="" # Suggested value for Debian by docs
-USE_LOCKING=1 # Prevents more than one `rkhunter` from running at once
-SHOW_SUMMARY_WARNINGS_NUMBER=1
-```
-
-#### 7.3.3 Update `rkhunter`
-```bash
-sudo rkhunter -C # Verify /etc/rkhunter.conf
-sudo rkhunter --versioncheck
-sudo rkhunter --update
-sudo rkhunter --propupd
-```
-
-### 7.4 Host intrusion detection (`ossec`)
+### 8.0 Host intrusion detection (`ossec`)
 By default, `ossec` runs a rootkit check every two hours.
 
-#### 7.4.0 Prepare to build from source
+#### 8.0.0 Prepare to build from source
 ```bash
 sudo apt install libevent-dev libz-dev libssl-dev libpcre2-dev build-essential
 ```
 
-#### 7.4.1 Install `ossec`
+#### 8.0.1 Install `ossec`
 When prompted by `install.sh`, provide the following specific answers:
 
 | ? | _ |
@@ -874,79 +841,29 @@ cd ossec-hids-3.6.0/
 sudo ./install.sh
 ```
 
-### 7.5 App intrusion detection (`fail2ban`)
-#### 7.5.0 Install `fail2ban`
-```bash
-sudo apt install fail2ban
-```
-
-#### 7.5.1 Edit `/etc/fail2ban/jail.local`
-`fail2ban` will recognize this as a configuration file.
-```bash
-[DEFAULT]
-# Ignore self
-ignoreip = 127.0.0.1/8 [LAN SEGMENT]
-
-# Send email
-destemail = account@gmail.com
-sender = account@gmail.com
-
-# exim4 to send mail
-mta = mail
-
-# Get email alerts
-action = %(action_mwl)s
-```
-
-#### 7.5.2 Create jails
-Jails can be created for any program, and presets exist for many, but the easy, obvious example is SSH.
-
-Create an SSH jail at `/etc/fail2ban/jail.d/ssh.local`:
-```bash
-[sshd]
-enabled = true
-banaction = ufw
-port = 54321 # custom SSH port here
-filter = sshd
-logpath = %(sshd_log)s
-maxretry = 5
-```
-
-#### 7.5.3 Enable `fail2ban`
-```bash
-sudo fail2ban-client start
-sudo fail2ban-client reload
-sudo fail2ban-client add sshd
-```
-
-#### 7.5.4 Check jail statuses
-```bash
-sudo fail2ban-client status
-```
-
-### 7.6 File system integrity monitoring (`aide`)
+### 8.1 File system integrity monitoring (`aide`)
 Monitors files and notifies when changes are detected. 
 
 Understand that **lots** of files get changed all the time, so there is a lot of garbage in the output by default. 
-See [Section 7.6.4](#).
+See [Section 8.1.3: Exclude files and folders](#813-exclude-files-and-folders).
 
-#### 7.6.0 Install `aide`
+#### 8.1.0 Install `aide`
 ```bash
 sudo apt install aide
 ```
 
-#### 7.6.1 Create initial database
+#### 8.1.1 Create initial database
 ```bash
 sudo aideinit
 ```
 
-#### 7.6.2 Configure daily checks
+#### 8.1.2 Configure daily checks
 Edit `/etc/default/aide`:
 ```bash
 CRON_DAILY_RUN=yes
 ```
 
-#### 7.6.3 Exclude files and folders
+#### 8.1.3 Exclude files and folders
 The safest way to exclude files from monitoring is to match regex patterns as closely as possible, avoiding blanket 
 rules. Finding a balance between convenience and actual value from file integrity monitoring is challenging.
 
@@ -967,13 +884,118 @@ MyRule = p+i+n+u+g+s+b+m+c+md5+sha1
 !/var/adm/utmp$  # ignore the file /var/adm/utmp
 ```
 
-#### 7.6.4 Maintain
+#### 8.1.4 Maintain
 Each time a known change is made to a file inside AIDE's scope, update the database with:
 ```bash
 sudo aideinit -y -f
 ```
 
-### 7.7 ARP monitoring (`arpwatch`)
+<hr />
+
+## Chapter 9: Malware
+Automatically scan network traffic for malware and set up rootkit detection.
+
+### 9.0 Antivirus (`clamav`)
+Default settings run definitions updates once an hour. Installing `clamdscan` enables automatic scanning on network. 
+`freshclam` and `clamd` services automatically start. 
+
+*Note: Never run `clamav` as root. `clamav` works by essentially opening every file it scans.*
+
+```bash
+sudo apt install clamav clamav-freshclam clamav-daemon clamdscan
+```
+
+### 9.1 Rootkit detection (`rkhunter`, `chkrootkit`)
+#### 9.1.0 Install packages
+```bash
+sudo apt install rkhunter chkrootkit
+```
+
+#### 9.1.1 Enable cron scripts
+```bash
+# Select `Yes` when asked, *Should chkrootkit be run automatically every day?* Use default for everything else
+sudo dpkg-reconfigure chkrootkit
+# Select `Yes` for all prompts
+sudo dpkg-reconfigure rkhunter
+```
+
+#### 9.1.2 Edit `/etc/rkhunter.conf`
+```bash
+UPDATE_MIRRORS=1
+MIRRORS_MODE=0 # Use mirrors from the internet
+MAIL-ON-WARNING=root # Send mail to `root` alias
+COPY_LOG_ON_ERROR=1 # Copy error logs to file
+PKGMGR=NONE # Suggested value for Debian by docs
+PHALANX_DIRTEST=1 # Suggested by docs
+WEB_CMD="" # Suggested value for Debian by docs
+USE_LOCKING=1 # Prevents more than one `rkhunter` from running at once
+SHOW_SUMMARY_WARNINGS_NUMBER=1
+```
+
+#### 9.1.3 Update `rkhunter`
+```bash
+sudo rkhunter -C # Verify /etc/rkhunter.conf
+sudo rkhunter --versioncheck
+sudo rkhunter --update
+sudo rkhunter --propupd
+```
+
+<hr />
+
+## Chapter 10: Network
+Watch out for intrusive computers on LAN and the Internet.
+
+### 10.0 App intrusion detection (`fail2ban`)
+#### 10.0.0 Install `fail2ban`
+```bash
+sudo apt install fail2ban
+```
+
+#### 10.0.1 Edit `/etc/fail2ban/jail.local`
+`fail2ban` will recognize this as a configuration file.
+```bash
+[DEFAULT]
+# Ignore self
+ignoreip = 127.0.0.1/8 [LAN SEGMENT]
+
+# Send email
+destemail = account@gmail.com
+sender = account@gmail.com
+
+# exim4 to send mail
+mta = mail
+
+# Get email alerts
+action = %(action_mwl)s
+```
+
+#### 10.0.2 Create jails
+Jails can be created for any program, and presets exist for many, but the easy, obvious example is SSH.
+
+Create an SSH jail at `/etc/fail2ban/jail.d/ssh.local`:
+```bash
+[sshd]
+enabled = true
+banaction = ufw
+port = 54321 # custom SSH port here
+filter = sshd
+logpath = %(sshd_log)s
+maxretry = 5
+```
+
+#### 10.0.3 Enable `fail2ban`
+```bash
+sudo fail2ban-client start
+sudo fail2ban-client reload
+sudo fail2ban-client add sshd
+```
+
+#### 10.0.4 Check jail statuses
+```bash
+sudo fail2ban-client status
+```
+
+### 10.1 ARP monitoring (`arpwatch`)
 ```bash
 sudo apt install arpwatch
 sudo service arpwatch start
@@ -981,21 +1003,42 @@ sudo service arpwatch start
 
 <hr />
 
-## Chapter 8: Kernel `sysctl`
+## Chapter 11: Kernel `sysctl`
 Edit `/etc/sysctl.conf` kernel options to comply with stricter security standards.
 
-### 8.0 Edit `/etc/sysctl.conf`
-TODO
+### 11.0 Edit `/etc/sysctl.conf`
+TODO: Document each rule.
 
-### 8.1 Test new settings
-TODO
+```bash
+dev.tty.ldisc_autoload = 0
 
-### 8.2 Restart server
-TODO
+fs.protected_fifos = 2
+fs.suid_dumpable = 0
+
+kernel.core_uses_pid = 1
+kernel.dmesg_restrict = 1
+kernel.kptr_restrict = 2
+kernel.sysrq = 0
+kernel.unprivileged_bpf_disabled = 1
+
+net.core.bpf_jit_harden = 2
+net.ipv4.conf.all.log_martians = 1
+net.ipv4.conf.all.rp_filter = 1
+net.ipv4.conf.all.send_redirects = 0
+net.ipv4.conf.default.accept_source_route = 0
+net.ipv4.conf.default.log_martians = 1
+```
+
+### 11.1 Test new settings
+After a successful test, consider rebooting to ensure things are OK.
+
+```bash
+sudo sysctl --system
+```
 
 <hr />
 
-## Chapter 9: Sandboxes
+## Chapter 12: Sandboxes
 Isolate programs in their own virtual machine to limit access to real resources. The guide uses Firejail, but Docker is 
 a great alternative.
 
@@ -1011,13 +1054,13 @@ a great alternative.
 > requirements.
 - [ ] Run daemons with `firejail`
 
-### 9.0 Install `firejail`
+### 12.0 Install `firejail`
 ```bash
 sudo apt install firejail firejail-profiles
 sudo firecfg # Generates profiles automatically for existing programs
 ```
 
-### 9.1 Run programs with `firejail`
+### 12.1 Run programs with `firejail`
 The easiest way to jail a program is to tell `firejail` to open the program with the default profile.
 
 ```bash
@@ -1026,7 +1069,7 @@ sudo ln -s /usr/bin/firejail /usr/local/bin/some-program # Where some-program is
 
 Now the program will always execute inside a jail.
 
-### 9.2 Run programs with `firejail` and specific jail options
+### 12.2 Run programs with `firejail` and specific jail options
 It is also possible to launch an application with the `firejail` command including the jail options, like:
 ```bash
 firejail --noprofile --disable-mnt --no3d ... -- my-program ...
@@ -1035,7 +1078,7 @@ firejail --noprofile --disable-mnt --no3d ... -- my-program ...
 See [Building Custom Profiles | Firejail](https://firejail.wordpress.com/documentation-2/building-custom-profiles/) 
 for the full list of options available here.
 
-### 9.3 Create profiles for programs in `firejail`
+### 12.3 Create profiles for programs in `firejail`
 Some programs do not comply with the default profile and need a custom profile with more refined editing.
 
 Create a custom profile at `/etc/firejail/some-program.profile`. Browse the existing profiles in `/etc/firejail` to 
@@ -1047,7 +1090,7 @@ the full list of options available here.
 The profile will be loaded automatically assuming the profile's file name is identical to the program's binary name, 
 e.g.: `/etc/firejail/geth.profile` to `/usr/bin/geth`.
 
-### 9.4 Run daemons with `firejail`
+### 12.4 Run daemons with `firejail`
 `firejail` has a quirk with daemonized programs (eg via `systemctl`). Manually updating `systemctl` to load a service with `firejail` will cause the service to hang indefinitely when started. 
 
 Edit the program's service module:
@@ -1071,15 +1114,16 @@ sudo systemctl restart program-name
 
 <hr />
 
-## Chapter 10: Audits
+## Chapter 13: Audits
 Check the security of the server by running standardized audit software to report common weaknesses.
 
 ### Objectives
-- [ ] Audit system with Lynis
-> Lynis will provide hundreds of suggestions on specific changes that can be made to improve security.
+- [ ] Audit system with `lynis`
+> Lynis will provide numerous suggestions on specific changes that can be made to improve security.
 > A great way to jump into more security subjects.
+- [ ] Audit system with `tiger`
 
-### 10.0 `lynis`
+### 13.0 Audit system with `lynis`
 The latest version of `lynis` is not available on Ubuntu by default. The following installation instructions can be
 found at https://packages.cisofy.com/community/#debian-ubuntu. 
 
@@ -1098,6 +1142,14 @@ sudo lynis audit system
 ```
 
 Browse https://github.com/CISOfy/lynis/blob/master/default.prf to find out exactly what `lynis` expects.
+
+### 13.1 Audit system with `tiger`
+`tiger` is old school but provides specific suggestions to improve security, where `lynis` generally requires more research. There is some overlap.
+
+```bash
+sudo apt install tiger
+sudo tiger
+```
 
 <hr />
 
@@ -1121,13 +1173,24 @@ TODO
 TODO
 
 ### 99.3 Process accounting
-TODO
+Log more detailed stats about the resources used by each running process.
+
+```bash
+sudo apt install acct
+touch /var/log/account/pacct
+sudo accton /var/log/account/pacct
+```
 
 ### 99.4 Two-factor authentication in SSH
-#TODO 
+TODO 
 
 ### 99.5 Restrict USB devices with `usbguard`
-#TODO 
+**Only complete this step if the system does not rely on any USB devices whatsoever**.
+
+```bash
+sudo apt install usbguard
+sudo service usbguard start
+```
 
 ### 99.6 Hardware security
-#TODO
+TODO
