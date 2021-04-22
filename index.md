@@ -482,13 +482,18 @@ Synchronize system time with the internet via Network Time Protocol.
 ### **Why...**
 **Enable NTP?** Servers rely on exact time and the best way to accomplish that is to synchronize with Internet time servers.
 
-### 4.0 Edit NTP configuration
+### 4.0 Install NTP
+```bash
+sudo apt install ntp
+```
+
+### 4.1 Edit NTP configuration
 ```bash
 sudo sed -i -r -e "s/^((server|pool).*)/# \1/" /etc/ntp.conf
 echo -e "\npool pool.ntp.org iburst" /etc/ntp.conf | sudo tee -a /etc/ntp.conf
 ```
 
-### 4.1 Restart service
+### 4.2 Restart service
 To catch errors should they come up.
 
 ```bash

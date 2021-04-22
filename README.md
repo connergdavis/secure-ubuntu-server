@@ -17,7 +17,7 @@ This guide is intended as a starting point for people who want to run a server o
 You may not be that person, and this guide may still be helpful. That's just where I'm coming from.
 
 ## Requirements
-#### A computer with
+### A computer with
 - Ubuntu 20.04
 - Internet
 - ??? storage
