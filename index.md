@@ -484,7 +484,7 @@ Synchronize system time with the internet via Network Time Protocol.
 
 ### 4.0 Edit NTP configuration
 ```bash
-sudo sed -i -r -e "s/^((server|pool).*)/# \1" /etc/ntp.conf
+sudo sed -i -r -e "s/^((server|pool).*)/# \1/" /etc/ntp.conf
 echo -e "\npool pool.ntp.org iburst" /etc/ntp.conf | sudo tee -a /etc/ntp.conf
 ```
 
@@ -530,6 +530,15 @@ It is worth learning about permissions to further restrict files where possible 
 # g=rx | User's groups can read and execute
 # o= | Other users can't do anything
 umask u=rwx,g=rx,o= # Sets default permissions for files created going forward
+```
+
+Also add this `umask` setting to `/etc/profile` and `/etc/bash.bashrc`.
+
+### 5.2 Update insecure permissions
+```bash
+sudo chmod 600 /etc/ssh/sshd_config
+sudo chmod 640 /etc/crontab
+sudo chmod 700 /etc/cron.d /etc/cron.daily /etc/cron.hourly /etc/cron.monthly /etc/cron.weekly
 ```
 
 <hr />
@@ -1025,6 +1034,8 @@ sudo apt install lynis
 # Run the actual audit
 sudo lynis audit system
 ```
+
+Browse https://github.com/CISOfy/lynis/blob/master/default.prf to find out exactly what `lynis` expects.
 
 <hr />
 
