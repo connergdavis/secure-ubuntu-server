@@ -942,7 +942,7 @@ sudo firecfg # Generates profiles automatically for existing programs
 ```
 
 ### 9.1 Run programs with `firejail`
-There are two ways to run programs inside a `firejail`. Programs that work fine on the default profile, or which have a built-in profile, can generally be jailed simply by doing:
+There are a few ways to sandbox with `firejail`. The easiest is to tell `firejail` to open the program with the default profile.
 
 ```bash
 sudo ln -s /usr/bin/firejail /usr/local/bin/some-program # Where some-program is currently at /usr/bin/ or /bin
@@ -950,17 +950,49 @@ sudo ln -s /usr/bin/firejail /usr/local/bin/some-program # Where some-program is
 
 Now the program will always execute inside a jail.
 
-### 9.2 Create profiles for programs in `firejail`
+### 9.2 Run programs with `firejail` and specific jail options
+It is also possible to launch an application with the `firejail` command including the jail options, like:
+```bash
+firejail --noprofile --disable-mnt --no3d ... -- my-program ...
+```
+
+See [Building Custom Profiles | Firejail](https://firejail.wordpress.com/documentation-2/building-custom-profiles/) for the full list of options available here.
+
+### 9.3 Create profiles for programs in `firejail`
 Some programs do not comply with the default profile and need a custom profile with more refined editing.
 
 Create a custom profile at `/etc/firejail/some-program.profile`. Browse the existing profiles in `/etc/firejail` to get an idea of the syntax and available options.
 
 See [Building Custom Profiles | Firejail](https://firejail.wordpress.com/documentation-2/building-custom-profiles/) for the full list of options available here.
 
-### 9.3 Run programs with `firejail` and jail options
-It is also possible to launch an application with the `firejail` command including the jail options, like:
+The profile will be loaded automatically assuming the profile's file name is identical to the program's binary name, e.g.: `/etc/firejail/geth.profile` to `/usr/bin/geth`.
+
+### 9.4 Run daemons with `firejail`
+`firejail` has a quirk with daemonized programs (eg via `systemctl`). Manually updating `systemctl` to load a service with `firejail` will cause the service to hang indefinitely when started. 
+
+Edit the program's service module:
 ```bash
-firejail --noprofile --disable-mnt --no3d ... -- my-program ...
+sudo systemctl edit program-name
+```
+
+And provide the following code:
+```bash
+[Service]
+Type=simple
+# "Reset" existing systemctl entry by blanking out first. Required for some reason.
+ExecStartPre=
+ExecStart=
+ExecReload=
+# Now prepend the command with firejail
+ExecStartPre= # run tests if applicable
+ExecStart=/usr/bin/firejail program-name
+ExecReload= # reload module if applicable
+```
+
+To update the module:
+```bash
+sudo systemctl daemon-reload
+sudo systemctl restart program-name
 ```
 
 <hr />
