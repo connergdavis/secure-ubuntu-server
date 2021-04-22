@@ -1,5 +1,6 @@
 # "Secure" Ubuntu Server
 ## <strong>Please read [README.md](https://github.com/connergdavis/secure-ubuntu-server/blob/master/index.md) before proceeding.</strong>
+
 ## References
 ### Security Benchmarks
 - [CIS Ubuntu 20.04 (cisecurity.org)](https://learn.cisecurity.org/l/799323/2021-04-01/41hcb)
@@ -181,9 +182,9 @@ There's all sorts of other things to do beyond the scope of this guide. It's jus
 Create a `sudo` user so root account can be disabled.
 
 ### **Objectives**
-&#9745; **Update Ubuntu**<br>
-&#9745; **Create `sudo` user**<br>
-&#9745; **Limit `su` command**
+- [ ] Update Ubuntu
+- [ ] Create `sudo` user
+- [ ] Limit `su` command
 
 ### **Why...**
 **Create `sudo` user**? Using root account means all programs are run by root account. Root lets a program do *anything*, but most programs need very little access. `sudo` can be used before a command to run that command as root,  eliminating the need to login as root at all.<br>
@@ -229,9 +230,9 @@ sudo dpkg-statoverride --update --add root suers 4750 /bin/su # Now `su` can onl
 Create SSH key login for local machine.
 
 ### **Objectives**
-&#9745; **Generate SSH key**<br>
-&#9745; **Authorize public key**<br>
-&#9745; **Login with SSH key**
+- [ ] Generate SSH key
+- [ ] Authorize public key
+- [ ] Login with SSH key
 
 ### **Why...**
 **Login with SSH key**? SSH keys are 256 bits, longer than most passwords, and do not need to be sent to the server like a password. **However, anyone who can read the private key file can login.** Secure these files, and the machine(s) storing them! **SSH keys can also be secured by a password, creating another layer.**
@@ -302,8 +303,8 @@ ssh some
 Tweak `sshd`'s configuration to provide much better security.
 
 ### **Objectives**
-&#9745; **Disable root user**<br>
-&#9745; **Secure `sshd`**
+- [ ] Disable root user
+- [ ] Secure `sshd`
 
 ### **Why...**
 **Disable root user**? SSH keys are 256 bits, longer than most passwords, and do not need to be sent to the server like a password. Note that SSH keys are stored in `~/.ssh/`: the security of these files on local machine is essential.<br>
@@ -425,9 +426,9 @@ sudo mv /etc/ssh/moduli.tmp /etc/ssh/moduli
 Use `ufw` to block all traffic by default, then explicitly allow certain services.
 
 ### **Objectives**
-&#9745; **Block everything by default**<br>
-&#9745; **Allow services (NTP, HTTP(S), DNS, FTP, `exim4`) out**<br>
-&#9745; **Allow services (SSH) in**
+- [ ] Block everything by default
+- [ ] Allow services (NTP, HTTP(S), DNS, FTP, `exim4`) out
+- [ ] Allow services (SSH) in
 
 ### **Why...**
 **Block everything by default?** Explicit control over traffic in and out of the server. Being "online" is a substantial security threat.
@@ -477,7 +478,7 @@ Synchronize system time with the internet via Network Time Protocol.
 *Note: NTP requires an open port specified in [Chapter 3: Firewall](#chapter-3-firewall).*
 
 ### **Objectives**
-&#9745; **Enable NTP**
+- [ ] Enable NTP
 
 ### **Why...**
 **Enable NTP?** Servers rely on exact time and the best way to accomplish that is to synchronize with Internet time servers.
@@ -508,8 +509,8 @@ sudo ntpq -p # Prints NTP peer status
 Hide process ID file descriptors in `/proc`, and set stricter default file and folder permissions.
 
 ### **Objectives**
-&#9745; **Hide process files in `/proc`**<br>
-&#9745; **Set default permissions**
+- [ ] Hide process files in `/proc`
+- [ ] Set default permissions
 
 ### **Why...**
 **Hide process files in `/proc`?** In Linux, a file is created in `/proc` for every active process. By default, those are readable by all users. We can change this behavior so only root can see them.<br>
@@ -554,8 +555,8 @@ Allow the server to send email logs securely to Gmail.
 *Note: Email requires an open port specified in [Chapter 3: Firewall](#chapter-3-firewall).*
 
 ### **Objectives**
-&#9745; **Install mail server**<br>
-&#9745; **Login to Gmail**
+- [ ] Install mail server
+- [ ] Login to Gmail
 
 ### **Why...**
 **Login to Gmail?** Gmail is easy and free to set up. Also eliminates the need to run a full mail server (our `exim4` is send-only).
@@ -661,14 +662,14 @@ sudo tail /var/log/exim4/mainlog # Read log results, especially if the test does
 Run scans for viruses, monitor intrusions, and more. Email results in human-readable format ondemand and daily.
 
 ### **Objectives**
-&#9745; **Daily reports about everything**<br>
-&#9745; **Automatic updates**<br>
-&#9745; **Antivirus**<br>
-&#9745; **Rootkit detection**<br>
-&#9745; **Host intrusion detection**<br>
-&#9745; **App intrusion detection**<br>
-&#9745; **File system monitoring**<br>
-&#9745; **ARP monitoring**<br>
+- [ ] Daily reports about everything
+- [ ] Automatic updates
+- [ ] Antivirus
+- [ ] Rootkit detection
+- [ ] Host intrusion detection
+- [ ] App intrusion detection
+- [ ] File system monitoring
+- [ ] ARP monitoring
 
 ### **Why...**
 **Daily reports about everything?** The server's security depends on its administrator keeping track of it every day. It is painful to bring all the system logs together and create filters on them which extract the most pertinent information (most logs spit out a LOT of data). `logwatch` can do all of that.<br>
@@ -945,8 +946,8 @@ TODO
 Isolate programs in their own virtual machine to limit access to real resources. The guide uses Firejail, but Docker is a great alternative.
 
 ### **Objectives**
-&#9745; **Run programs with `firejail`**<br>
-&#9745; **Create profiles for programs in `firejail`**
+- [ ] Run programs with `firejail`
+- [ ] Create profiles for programs in `firejail`
 
 ### **Why...**
 **Run programs with `firejail`?** Most programs do not need access to the vast majority of the resources available to the machine. Allowing that access creates a large area for exposure.<br>
@@ -1018,7 +1019,7 @@ sudo systemctl restart program-name
 Check the security of the server by running standardized audit software to report common weaknesses.
 
 ### **Objectives**
-&#9745; **Audit system with Lynis**
+- [ ] Audit system with Lynis
 
 ### **Why...**
 **Audit system with Lynis**? Lynis will provide hundreds of suggestions on specific changes that can be made to improve security. A great way to jump into more security subjects.
