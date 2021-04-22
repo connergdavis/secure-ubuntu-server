@@ -181,15 +181,15 @@ There's all sorts of other things to do beyond the scope of this guide. It's jus
 ## Chapter 0: Beginning
 Create a `sudo` user so root account can be disabled.
 
-### **Objectives**
+### Objectives
+- [ ] SSH to root account
 - [ ] Update Ubuntu
+- [ ] Create secure password
 - [ ] Create `sudo` user
-> Using root account means all programs are run by root account. 
-> Root lets a program do *anything*, but most programs need very little access.
-> `sudo` can be used before a command to run that command as root - no need to login as root.
+> Root is full access - most programs don't need anywhere near that. `sudo` lets normal users run commands as root when 
+> the higher privilege is actually needed.
 - [ ] Limit `su` command
-> `su` allows users to switch to other accounts, including root.
-> That's a powerful privilege.
+> `su` allows users to switch to other accounts, including root. That's a powerful privilege.
 
 ### 0.0 SSH to root account
 ```bash
@@ -230,30 +230,39 @@ sudo dpkg-statoverride --update --add root suers 4750 /bin/su # Now `su` can onl
 ## Chapter 1: Local SSH
 Create SSH key login for local machine.
 
-### **Objectives**
+### Objectives
 - [ ] Generate SSH key
+- [ ] Set safer permissions
 - [ ] Authorize public key
 - [ ] Login with SSH key
-
-### **Why...**
-**Login with SSH key**? SSH keys are 256 bits, longer than most passwords, and do not need to be sent to the server like a password. **However, anyone who can read the private key file can login.** Secure these files, and the machine(s) storing them! **SSH keys can also be secured by a password, creating another layer.**
+> SSH keys are 256 bits, longer than most passwords, and do not need to be sent to the server like a password.
+> **However, anyone who can read the private key file can login.** Secure these files, and the machine(s) storing them!
+> **SSH keys can also be secured by a password, creating another layer.**
 
 *Note: `id_some`, `id_some.pub`, and `config` all belong on local machine. Server only needs `authorized_keys`.*
 
 ### 1.0 Generate SSH key
-Use a custom Gmail account for the server instead of a personal address. **This guide relies on Gmail to send mail**, but everything will work just as well on Yahoo, for example, with some extra work not covered here.<br>
-*Note: When prompted, "Enter a file in which to save the key", provide path: `/home/$USER/.ssh/id_some` where `some` is something memorable*
+Use a custom Gmail account for the server instead of a personal address. **This guide relies on Gmail to send mail**, 
+but everything will work just as well on Yahoo, for example, with some extra work not covered here.
+
+| Generating public/private ed25519 key pair. | ... |
+| -- | -- |
+| **Enter a file in which to save the key:** | `/home/$USER/.ssh/id_some` |
+| **Enter passphrase:** | Please strongly consider providing a unique passphrase here to strength SSH key connection. |
+
 ```bash
-# When prompted, "Enter a file in which to save the key", provide path: `/home/$USER/.ssh/id_some` where `some` is something memorable
-# When prompted, please consider providing another unique password for the SSH key
 ssh-keygen -t ed25519 -C "myserver@gmail.com" # Generate SSH keypair
 ssh-add ~/.ssh/id_some # Register new keypair with sshd
 ```
 
 ### 1.1 Set safer permissions
-In Linux, every file has rules for what the (1) user and (2) group who owns the file can do, and what (3) everyone else can do. These comprise the three consecutive numbers in `chmod` commands. For example, `700` gives full access to (1) the owner but no access to (2) the owner's groups or (3) other users - `0` denotes no access, `7` full access.
+In Linux, every file has rules for what the (1) user and (2) group who owns the file can do, and what (3) everyone else 
+can do. These comprise the three consecutive numbers in `chmod` commands. For example, `700` gives full access to (1) 
+the owner but no access to (2) the owner's groups or (3) other users - `0` denotes no access, `7` full access.
 
-SSH uses public key cryptography for "SSH keys". **TL;DR**: private key must be protected at all costs, public key is innocuous.
+SSH uses public key cryptography for "SSH keys". **TL;DR**: private key must be protected at all costs, public key is 
+innocuous.
+
 ```bash
 chmod 644 ~/.ssh/id_some.pub # Limit public key access - someone else reading this is not dangerous
 chmod 600 ~/.ssh/id_some # Lock down private key - this is dangerous
@@ -276,16 +285,19 @@ Host myalias
   HostName myserver.net
   Port 22
   IdentityFile ~/.ssh/id_some
+  IdentitiesOnly yes
 ```
 
 ### 1.3 Copy public key
 Ensure trailing whitespace is not included in copy-paste.
+
 ```bash
 cat ~/.ssh/id_some.pub
 ```
 
 ### 1.4 Authorize public key
 Return to server SSH shell for this step.
+
 ```bash
 touch ~/.ssh/authorized_keys
 chmod 600 ~/.ssh/authorized_keys
@@ -294,6 +306,7 @@ echo "(public key from clipboard)" > ~/.ssh/authorized_keys
 
 ### 1.5 Login with SSH key
 Close existing SSH to `root` upon success.
+
 ```bash
 ssh some
 ```
@@ -303,16 +316,20 @@ ssh some
 ## Chapter 2: SSH
 Tweak `sshd`'s configuration to provide much better security.
 
-### **Objectives**
+### Objectives
 - [ ] Disable root user
+> SSH keys are 256 bits, longer than most passwords, and do not need to be sent to the server like a password. 
+> Note that SSH keys are stored in `~/.ssh/`: the security of these files on local machine is essential.
+- [ ] Create SSH group
 - [ ] Secure `sshd`
-
-### **Why...**
-**Disable root user**? SSH keys are 256 bits, longer than most passwords, and do not need to be sent to the server like a password. Note that SSH keys are stored in `~/.ssh/`: the security of these files on local machine is essential.<br>
-**Secure `sshd`**? SSH port must be open to public all the time, and home network IP changes dynamically, so whitelists are not an option for the average person.
+> SSH port must be open to public all the time, and home network IP changes dynamically, so whitelists are not an option
+> for the average person.
+- [ ] Only use long Diffie-Hellman moduli
+> Recommended by Mozilla InfoSec.
 
 ### 2.0 Disable root user
-With a `sudo` user, any command that needs root access can be run without the root account itself. Thus, root account can be safely disabled.
+With a `sudo` user, any command that needs root access can be run without the root account itself. Thus, root account 
+can be safely disabled.
 
 *Note: Technically, this just makes it impossible to login to root shell.*
 
@@ -426,13 +443,12 @@ sudo mv /etc/ssh/moduli.tmp /etc/ssh/moduli
 ## Chapter 3: Firewall
 Use `ufw` to block all traffic by default, then explicitly allow certain services.
 
-### **Objectives**
+### Objectives
 - [ ] Block everything by default
-- [ ] Allow services (NTP, HTTP(S), DNS, FTP, `exim4`) out
-- [ ] Allow services (SSH) in
-
-### **Why...**
-**Block everything by default?** Explicit control over traffic in and out of the server. Being "online" is a substantial security threat.
+> Explicit control over traffic in and out of the server. Being "online" is a substantial security threat.
+- [ ] Allow services out: DNS, FTP, HTTP(S), NTP, `exim4`
+- [ ] Allow services in: SSH
+- [ ] Enable UFW
 
 ### 3.0 Block everything by default
 ```bash
@@ -442,7 +458,8 @@ sudo ufw default deny incoming
 ```
 
 ### 3.1 Allow services out: DNS, FTP, HTTP(S), NTP, `exim4`
-The format of simple port rules is `allow/deny` `in/out` `port`. This can be more complex if restricting IPs, for example.
+The format of simple port rules is `allow/deny` `in/out` `port`. This can be more complex if restricting IPs, for 
+example.
 
 ```bash
 sudo ufw allow out 53 comment 'DNS' # A universal need
@@ -464,7 +481,8 @@ sudo ufw limit in 54321 comment 'SSH' # Replace 54321 by custom SSH port, or ssh
 ```
 
 ### 3.3 Enable UFW
-**Before proceeding**, open another SSH connection. `ufw enable` will close current SSH terminal if rules were set incorrectly.
+**Before proceeding**, open another SSH connection. `ufw enable` will close current SSH terminal if rules were set
+incorrectly.
 
 ```bash
 sudo ufw enable # Turns on firewall rules
@@ -478,11 +496,11 @@ Synchronize system time with the internet via Network Time Protocol.
 
 *Note: NTP requires an open port specified in [Chapter 3: Firewall](#chapter-3-firewall).*
 
-### **Objectives**
-- [ ] Enable NTP
-
-### **Why...**
-**Enable NTP?** Servers rely on exact time and the best way to accomplish that is to synchronize with Internet time servers.
+### Objectives
+- [ ] Install NTP
+> Servers rely on accurate system time, and NTP Internet servers are relied upon across the world.
+- [ ] Edit NTP configuration
+- [ ] Restart service
 
 ### 4.0 Install NTP
 ```bash
@@ -496,8 +514,6 @@ echo -e "\npool pool.ntp.org iburst" /etc/ntp.conf | sudo tee -a /etc/ntp.conf
 ```
 
 ### 4.2 Restart service
-To catch errors should they come up.
-
 ```bash
 sudo service ntp restart # Restarts NTP service, which is running constantly in background
 sudo service ntp status # Checks on status of service with latest stdout, will report errors
@@ -509,16 +525,18 @@ sudo ntpq -p # Prints NTP peer status
 ## Chapter 5: File systems
 Hide process ID file descriptors in `/proc`, and set stricter default file and folder permissions.
 
-### **Objectives**
+### Objectives
 - [ ] Hide process files in `/proc`
+> In Linux, a file is created in `/proc` for every active process. By default, those are readable by all users. 
+> We can change this behavior so only root can see them.
 - [ ] Set default permissions
-
-### **Why...**
-**Hide process files in `/proc`?** In Linux, a file is created in `/proc` for every active process. By default, those are readable by all users. We can change this behavior so only root can see them.<br>
-**Set default permissions?** The default permissions set for new files is quite permissive. Generally speaking most files can be limited to at least exclude other users. If someone gains control of one account, the damage is heavily mitigated.
+> The default permissions set for new files is quite permissive. Generally speaking most files can be limited to at 
+> least exclude other users. If someone gains control of one account, the damage is heavily mitigated.
+- [ ] Update insecure permissions
 
 ### 5.0 Hide process files in `proc`
-Per [`man proc`](https://linux.die.net/man/5/proc), by default there is a file for every process running on the system inside `/proc/`, e.g., `/proc/1`, and that file happens to be readable by all users.
+Per [`man proc`](https://linux.die.net/man/5/proc), by default there is a file for every process running on the system 
+inside `/proc/`, e.g., `/proc/1`, and that file happens to be readable by all users.
 
 ```bash
 echo -e "\nproc    /proc    proc    defaults,hidepid=2    0    0" | sudo tee -a /etc/fstab
@@ -526,9 +544,12 @@ sudo reboot
 ```
 
 ### 5.1 Set default permissions
-Permissions sets can be described in a few different formats, but the most common number format representation of the following defaults is `027` or `0027`.
+Permissions sets can be described in a few different formats, but the most common number format representation of the 
+following defaults is `027` or `0027`.
 
 It is worth learning about permissions to further restrict files where possible (e.g., `.ssh` folder).
+
+Setting `umask` enforces the default permission policy.
 
 ```bash
 # Equivalent to code "027" or "0027"
@@ -539,7 +560,7 @@ It is worth learning about permissions to further restrict files where possible 
 umask u=rwx,g=rx,o= # Sets default permissions for files created going forward
 ```
 
-Also add this `umask` setting to `/etc/profile` and `/etc/bash.bashrc`.
+Also add this `umask` setting anywhere in `/etc/profile` and `/etc/bash.bashrc`.
 
 ### 5.2 Update insecure permissions
 ```bash
@@ -555,12 +576,17 @@ Allow the server to send email logs securely to Gmail.
 
 *Note: Email requires an open port specified in [Chapter 3: Firewall](#chapter-3-firewall).*
 
-### **Objectives**
+### Objectives
 - [ ] Install mail server
+- [ ] Configure `exim4`
+- [ ] Create Gmail login
+- [ ] Protect Gmail login
+- [ ] Generate login certificate
 - [ ] Login to Gmail
-
-### **Why...**
-**Login to Gmail?** Gmail is easy and free to set up. Also eliminates the need to run a full mail server (our `exim4` is send-only).
+> Gmail is easy and free to set up. Also eliminates the need to run a full mail server (our `exim4` is send-only).
+- [ ] Edit `/etc/aliases`
+- [ ] Restart `exim4`
+- [ ] Send test email
 
 ### 6.0 Install mail server (`exim4`)
 `openssl` and `ca-certificates` are also needed to log into Gmail servers.
@@ -580,7 +606,8 @@ When prompted, continue with the default setting for all but the following optio
 | **IP-address or host name of the outgoing smarthost** | `smtp.gmail.com::465` |
 
 ```bash
-sudo dpkg-reconfigure exim4-config # Visual config instead of a file; navigate with arrow keys, Enter to go forward, Esc to go back
+# Visual config instead of a file; navigate with arrow keys, Enter to go forward, Esc to go back
+sudo dpkg-reconfigure exim4-config
 ```
 
 ### 6.2 Create Gmail login
@@ -594,7 +621,6 @@ smtp.gmail.com:address@gmail.com:password
 ```
 
 ### 6.3 Protect Gmail login
-
 Lock the new password file down.
 
 *Note: `Debian-exim` is the default group used by `exim4` to send mail*
@@ -639,7 +665,8 @@ sudo sed -i -r -e "/\.ifdef MAIN_TLS_ENABLE/ a\n .ifdef TLS_ON_CONNECT_PORTS\n t
 ```
 
 ### 6.6 Edit `/etc/aliases`
-To avoid copying the email address to every application that will send mail, overwrite the `root` mail alias. That's a lot easier than copying the email address for each program that sends mail.
+To avoid copying the email address to every application that will send mail, overwrite the `root` mail alias. That's a 
+lot easier than copying the email address for each program that sends mail.
 
 ```
 root: address@gmail.com
@@ -662,9 +689,14 @@ sudo tail /var/log/exim4/mainlog # Read log results, especially if the test does
 ## Chapter 7: Reports
 Run scans for viruses, monitor intrusions, and more. Email results in human-readable format ondemand and daily.
 
-### **Objectives**
+### Objectives
 - [ ] Daily reports about everything
+> The server's security depends on its administrator keeping track of it every day. It is painful to bring all the 
+> system logs together and create filters on them which extract the most pertinent information (most logs spit out a 
+> LOT of data). `logwatch` can do all of that.
 - [ ] Automatic updates
+> Sometimes, the administrator can't be available for some time, but staying up to date is one of the most important 
+> objectives.
 - [ ] Antivirus
 - [ ] Rootkit detection
 - [ ] Host intrusion detection
@@ -672,17 +704,10 @@ Run scans for viruses, monitor intrusions, and more. Email results in human-read
 - [ ] File system monitoring
 - [ ] ARP monitoring
 
-### **Why...**
-**Daily reports about everything?** The server's security depends on its administrator keeping track of it every day. It is painful to bring all the system logs together and create filters on them which extract the most pertinent information (most logs spit out a LOT of data). `logwatch` can do all of that.<br>
-**Automatic updates?** Sometimes, the administrator can't be available for some time, but staying up to date is one of the most important objectives.<br>
-**Rootkit detection?** _<br>
-**Host intrusion detection?** _<br>
-**App intrusion detection?** _<br>
-**File system monitoring?** _<br>
-**ARP monitoring?** _<br>
-
 ### 7.0 Daily reports about everything (`logwatch`)
-Logwatch is an extremely convenient tool that creates a human readable compilation of reports based on what's found in `/var/log`. By default, Logwatch includes things like disk and network usage and SSH traffic. Notably, Logwatch includes log file filters, e.g. SSH failed connections are printed as one line per user.
+Logwatch is an extremely convenient tool that creates a human readable compilation of reports based on what's found in 
+`/var/log`. By default, Logwatch includes things like disk and network usage and SSH traffic. Notably, Logwatch 
+includes log file filters, e.g. SSH failed connections are printed as one line per user.
 
 ```bash
 sudo apt install logwatch
@@ -732,7 +757,8 @@ Unattended-Upgrade::Origins-Pattern {
 Unattended-Upgrade::Package-Blacklist {
 };
 
-// Run dpkg --force-confold --configure -a if a unclean dpkg state is detected to true to ensure that updates get installed even when the system got interrupted during a previous run
+// Run dpkg --force-confold --configure -a if a unclean dpkg state is detected to true to ensure that updates get 
+// installed even when the system got interrupted during a previous run
 Unattended-Upgrade::AutoFixInterruptedDpkg "true";
 
 //Perform the upgrade when the machine is running because we wont be shutting our server down often
@@ -758,7 +784,8 @@ Unattended-Upgrade::Automatic-Reboot-WithUsers "true";
 ```
 
 ### 7.2 Antivirus (`clamav`)
-Default settings run definitions updates once an hour. Installing `clamdscan` enables automatic scanning on network. `freshclam` and `clamd` services automatically start. 
+Default settings run definitions updates once an hour. Installing `clamdscan` enables automatic scanning on network. 
+`freshclam` and `clamd` services automatically start. 
 
 *Note: Never run `clamav` as root. `clamav` works by essentially opening every file it scans.*
 
@@ -818,7 +845,8 @@ When prompted by `install.sh`, provide the following specific answers:
 | What's your e-mail address? | `address@gmail.com` |
 
 ```bash
-wget https://github.com/ossec/ossec-hids/archive/3.6.0.tar.gz # Be sure to check https://github.com/ossec/ossec-hids for version
+# Be sure to check https://github.com/ossec/ossec-hids for version
+wget https://github.com/ossec/ossec-hids/archive/3.6.0.tar.gz
 tar xzf 3.6.0.tar.gz # Extracts zip to folder
 cd ossec-hids-3.6.0/
 sudo ./install.sh
@@ -877,7 +905,8 @@ sudo fail2ban-client status
 ### 7.6 File system integrity monitoring (`aide`)
 Monitors files and notifies when changes are detected. 
 
-Understand that **lots** of files get changed all the time, so there is a lot of garbage in the output by default. See [Section 7.6.4](#).
+Understand that **lots** of files get changed all the time, so there is a lot of garbage in the output by default. 
+See [Section 7.6.4](#).
 
 #### 7.6.0 Install `aide`
 ```bash
@@ -896,7 +925,8 @@ CRON_DAILY_RUN=yes
 ```
 
 #### 7.6.3 Exclude files and folders
-The safest way to exclude files from monitoring is to match regex patterns as closely as possible, avoiding blanket rules. Finding a balance between convenience and actual value from file integrity monitoring is challenging.
+The safest way to exclude files from monitoring is to match regex patterns as closely as possible, avoiding blanket 
+rules. Finding a balance between convenience and actual value from file integrity monitoring is challenging.
 
 To add exclusions, add something like the following to the end of `/etc/aide/aide.conf`:
 ```bash
@@ -944,15 +974,20 @@ TODO
 <hr />
 
 ## Chapter 9: Sandboxes
-Isolate programs in their own virtual machine to limit access to real resources. The guide uses Firejail, but Docker is a great alternative.
+Isolate programs in their own virtual machine to limit access to real resources. The guide uses Firejail, but Docker is 
+a great alternative.
 
-### **Objectives**
+### Objectives
+- [ ] Install `firejail`
 - [ ] Run programs with `firejail`
+> Most programs do not need access to the vast majority of the resources available to the machine. Allowing that access 
+> creates a large area for exposure.
+- [ ] Run programs with `firejail` and specific jail options
 - [ ] Create profiles for programs in `firejail`
-
-### **Why...**
-**Run programs with `firejail`?** Most programs do not need access to the vast majority of the resources available to the machine. Allowing that access creates a large area for exposure.<br>
-**Create profiles for programs in `firejail`?** Some programs are not compatible with the default `firejail` profile and require custom profiles to function correctly. That isn't a bad thing - `firejail` is designed to adapt because programs have very different sets of requirements.
+> Some programs are not compatible with the default `firejail` profile and require custom profiles to function 
+> correctly. That isn't a bad thing - `firejail` is designed to adapt because programs have very different sets of 
+> requirements.
+- [ ] Run daemons with `firejail`
 
 ### 9.0 Install `firejail`
 ```bash
@@ -961,7 +996,7 @@ sudo firecfg # Generates profiles automatically for existing programs
 ```
 
 ### 9.1 Run programs with `firejail`
-There are a few ways to sandbox with `firejail`. The easiest is to tell `firejail` to open the program with the default profile.
+The easiest way to jail a program is to tell `firejail` to open the program with the default profile.
 
 ```bash
 sudo ln -s /usr/bin/firejail /usr/local/bin/some-program # Where some-program is currently at /usr/bin/ or /bin
@@ -975,16 +1010,20 @@ It is also possible to launch an application with the `firejail` command includi
 firejail --noprofile --disable-mnt --no3d ... -- my-program ...
 ```
 
-See [Building Custom Profiles | Firejail](https://firejail.wordpress.com/documentation-2/building-custom-profiles/) for the full list of options available here.
+See [Building Custom Profiles | Firejail](https://firejail.wordpress.com/documentation-2/building-custom-profiles/) 
+for the full list of options available here.
 
 ### 9.3 Create profiles for programs in `firejail`
 Some programs do not comply with the default profile and need a custom profile with more refined editing.
 
-Create a custom profile at `/etc/firejail/some-program.profile`. Browse the existing profiles in `/etc/firejail` to get an idea of the syntax and available options.
+Create a custom profile at `/etc/firejail/some-program.profile`. Browse the existing profiles in `/etc/firejail` to 
+get an idea of the syntax and available options.
 
-See [Building Custom Profiles | Firejail](https://firejail.wordpress.com/documentation-2/building-custom-profiles/) for the full list of options available here.
+See [Building Custom Profiles | Firejail](https://firejail.wordpress.com/documentation-2/building-custom-profiles/) for 
+the full list of options available here.
 
-The profile will be loaded automatically assuming the profile's file name is identical to the program's binary name, e.g.: `/etc/firejail/geth.profile` to `/usr/bin/geth`.
+The profile will be loaded automatically assuming the profile's file name is identical to the program's binary name, 
+e.g.: `/etc/firejail/geth.profile` to `/usr/bin/geth`.
 
 ### 9.4 Run daemons with `firejail`
 `firejail` has a quirk with daemonized programs (eg via `systemctl`). Manually updating `systemctl` to load a service with `firejail` will cause the service to hang indefinitely when started. 
@@ -998,14 +1037,8 @@ And provide the following code:
 ```bash
 [Service]
 Type=simple
-# "Reset" existing systemctl entry by blanking out first. Required for some reason.
-ExecStartPre=
-ExecStart=
-ExecReload=
-# Now prepend the command with firejail
-ExecStartPre= # run tests if applicable
-ExecStart=/usr/bin/firejail program-name
-ExecReload= # reload module if applicable
+ExecStart= # "Reset" existing systemctl entry by blanking out first. Required for some reason.
+ExecStart=/usr/bin/firejail program-name # Now prepend command with firejail
 ```
 
 To update the module:
@@ -1019,14 +1052,17 @@ sudo systemctl restart program-name
 ## Chapter 10: Audits
 Check the security of the server by running standardized audit software to report common weaknesses.
 
-### **Objectives**
+### Objectives
 - [ ] Audit system with Lynis
+> Lynis will provide hundreds of suggestions on specific changes that can be made to improve security.
+> A great way to jump into more security subjects.
 
 ### **Why...**
-**Audit system with Lynis**? Lynis will provide hundreds of suggestions on specific changes that can be made to improve security. A great way to jump into more security subjects.
+**Audit system with Lynis**? 
 
 ### 10.0 `lynis`
-The latest version of `lynis` is not available on Ubuntu by default. The following installation instructions can be found at https://packages.cisofy.com/community/#debian-ubuntu. 
+The latest version of `lynis` is not available on Ubuntu by default. The following installation instructions can be
+found at https://packages.cisofy.com/community/#debian-ubuntu. 
 
 ```bash
 sudo apt install apt-transport-https
@@ -1047,7 +1083,9 @@ Browse https://github.com/CISOfy/lynis/blob/master/default.prf to find out exact
 <hr />
 
 ## Chapter 98: Keep local system safe
-It's fun to set up a `firejail` for every process and receive daily reports about file system integrity, but none of that matters if the local machine used to connect is breached. The SSH key and sudoer password are essential to the security of the system. Systems used to connect should ideally be just as safe as the server itself.
+It's fun to set up a `firejail` for every process and receive daily reports about file system integrity, but none of 
+that matters if the local machine used to connect is breached. The SSH key and sudoer password are essential to the 
+security of the system. Systems used to connect should ideally be just as safe as the server itself.
 
 <hr />
 
