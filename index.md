@@ -184,13 +184,12 @@ Create a `sudo` user so root account can be disabled.
 ### **Objectives**
 - [ ] Update Ubuntu
 - [ ] Create `sudo` user
-```
-Using root account means all programs are run by root account. Root lets a program do *anything*, but most programs need very little access. `sudo` can be used before a command to run that command as root,  eliminating the need to login as root at all.
-```
+> Using root account means all programs are run by root account. 
+> Root lets a program do *anything*, but most programs need very little access.
+> `sudo` can be used before a command to run that command as root - no need to login as root.
 - [ ] Limit `su` command
-```
-`su` allows users to switch to other accounts, including root. That's a powerful privilege.
-```
+> `su` allows users to switch to other accounts, including root.
+> That's a powerful privilege.
 
 ### 0.0 SSH to root account
 ```bash
