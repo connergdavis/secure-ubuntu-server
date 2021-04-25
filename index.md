@@ -10,14 +10,14 @@
 - [imthenachoman/How-To-Secure-A-Linux-Server (github.com)](https://github.com/imthenachoman/How-To-Secure-A-Linux-Server)
 - [Linux workstation security checklist (github.com)](https://github.com/lfit/itpol/blob/master/linux-workstation-security.md)
 - [Securing Debian Manual (debian.org)](https://www.debian.org/doc/manuals/securing-debian-manual/index.en.html)
-- [Security - Arch Linux Wiki (archlinux.org)](https://wiki.archlinux.org/index.php/Security)
+- [Security - ArchWiki (archlinux.org)](https://wiki.archlinux.org/index.php/Security)
 - [Security hardening Red Hat Enterprise Linux (redhat.com)](https://access.redhat.com/documentation/en-us/red_hat_enterprise_linux/8/html/security_hardening/index)
 
 ### In Chapter 0: Introduction
 TODO
 
 ### In Chapter 1: Local SSH
-TODO
+- [Generating a new SSH key and adding it to the ssh-agent (github.com)](https://docs.github.com/en/github/authenticating-to-github/generating-a-new-ssh-key-and-adding-it-to-the-ssh-agent)
 
 ### In Chapter 2: SSH
 - [Security Guidelines: OpenSSH (mozilla.org)](https://infosec.mozilla.org/guidelines/openssh.html)
@@ -37,27 +37,29 @@ TODO
 TODO
 
 ### In Chapter 7: Reports
-TODO
+- [Logwatch - ArchWiki (archlinux.org)](https://wiki.archlinux.org/index.php/Logwatch)
 
 ### In Chapter 8: File integrity
 - [The AIDE Manual (aide.github.io)](https://aide.github.io/doc/#config)
+- [OSSEC Documentation (ossec.net)](https://www.ossec.net/docs/)
 
 ### In Chapter 9: Malware
-- [What is a rootkit, and how to stop them (norton.com)](https://us.norton.com/internetsecurity-malware-what-is-a-rootkit-and-how-to-stop-them.html)
 - [Installation on Debian and Ubuntu Linux Distributions (clamav.net)](https://www.clamav.net/documents/installation-on-debian-and-ubuntu-linux-distributions)
+- [What is a rootkit, and how to stop them (norton.com)](https://us.norton.com/internetsecurity-malware-what-is-a-rootkit-and-how-to-stop-them.html)
 
 ### In Chapter 10: Network
 TODO
 
 ### In Chapter 11: Kernel `sysctl`
-- [`sysctl` - Arch Linux Wiki (archlinux.org)](https://wiki.archlinux.org/index.php/Sysctl#TCP/IP_stack_hardening)
+- [`sysctl` - ArchWiki (archlinux.org)](https://wiki.archlinux.org/index.php/Sysctl#TCP/IP_stack_hardening)
 
 ### In Chapter 12: Sandboxes
 - [`man firejail` (firejail.wordpress.com)](https://firejail.wordpress.com/features-3/man-firejail/)
 - [Building Custom Profiles (firejail.wordpress.com)](https://firejail.wordpress.com/documentation-2/building-custom-profiles/)
 
 ### In Chapter 13: Audits
-- [CISOfy Software Repository (cisofy.com)](https://packages.cisofy.com/community/#debian-ubuntu)
+- [CISOfy Software Repository (cisofy.com)](https://packages.cisofy.com/community/#debian-ubuntu) (note: install instructions)
+- [CISOfy/lynis (github.com)](https://github.com/CISOfy/lynis/) (note: Lynis rule conditions)
 
 <hr />
 
