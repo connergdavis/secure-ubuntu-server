@@ -637,7 +637,7 @@ sudo dpkg-reconfigure exim4-config
 ```
 
 ### 6.2 Create Gmail login
-Provide login credentials so `exim4` can send email on your behalf.
+Provide login credentials so `exim4` can send email on your behalf. **Consider enabling two-factor authentication in Gmail, then creating an [App Password](https://support.google.com/accounts/answer/185833?hl=en) here instead.**
 
 Edit `/etc/exim4/passwd.client`:
 
