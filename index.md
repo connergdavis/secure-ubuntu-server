@@ -491,7 +491,7 @@ example.
 ```bash
 sudo ufw allow out 53 comment 'DNS' # A universal need
 sudo ufw allow out 123 comment 'NTP' # Required to use NTP as described in the guide
-sudo ufw allow out 465/tcp comment 'exim4' # Required to send email via exim4
+sudo ufw allow out 587/tcp comment 'exim4' # Required to send email via exim4
 
 # The following are generally required to do `apt update`
 sudo ufw allow out http comment 'HTTP'
@@ -629,7 +629,7 @@ When prompted, continue with the default setting for all but the following optio
 | **General type of mail configuration** | `mail sent by smarthost; no local mail` |
 | **System mail name** | `localhost` |
 | **Visible domain name for local users** | `localhost` |
-| **IP-address or host name of the outgoing smarthost** | `smtp.gmail.com::465` |
+| **IP-address or host name of the outgoing smarthost** | `smtp.gmail.com::587` |
 
 ```bash
 # Visual config instead of a file; navigate with arrow keys, Enter to go forward, Esc to go back
