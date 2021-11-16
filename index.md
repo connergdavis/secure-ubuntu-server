@@ -497,7 +497,6 @@ sudo ufw allow out 465/tcp comment 'exim4' # Required to send email via exim4
 sudo ufw allow out http comment 'HTTP'
 sudo ufw allow out https comment 'HTTPS'
 sudo ufw allow out ftp comment 'FTP'
-sudo ufw allow out whois comment 'WHOIS'
 ```
 
 ### 3.2 Allow services in: SSH
